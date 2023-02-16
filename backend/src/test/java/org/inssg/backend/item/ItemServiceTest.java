@@ -1,13 +1,23 @@
 package org.inssg.backend.item;
 
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.Assert;
+
+import javax.swing.*;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class ItemServiceTest {
 
+
+    private ItemService itemService;
+
+    @BeforeEach
+    void setUp() {
+        itemService = new ItemService();
+    }
 
     //TODO상품조회리스트 테스트 구현
     @Test
@@ -32,4 +42,10 @@ public class ItemServiceTest {
         }
     }
 
+    private class ItemService {
+
+        public ItemResponse getList() {
+            return null;
+        }
+    }
 }
