@@ -13,11 +13,23 @@ public class ItemServiceTest {
     @Test
     void 상품조회() {
         //상품조회
-        ProductResponse response = productService.getList();
+        ItemResponse response = itemService.getList();
         //상품검증
         assertThat(response).isNotNull();
     }
 
+    private class ItemResponse {
+        Long id;
+        String name;
+        String imgPath;
+        int price;
 
+        public ItemResponse(Long id, String name, String imgPath, int price) {
+            this.id = id;
+            this.name = name;
+            this.imgPath = imgPath;
+            this.price = price;
+        }
+    }
 
 }
