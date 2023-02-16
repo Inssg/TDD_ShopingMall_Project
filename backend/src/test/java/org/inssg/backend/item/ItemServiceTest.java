@@ -33,7 +33,13 @@ public class ItemServiceTest {
         //상품조회
         List<ItemResponse> response = itemService.getList();
         //상품검증
-        assertThat(response).isNotNull();
+        assertThat(response.get(0).name).isEqualTo("프로틴");
+        assertThat(response.get(0).imgPath).isEqualTo("https://unsplash.com/2");
+        assertThat(response.get(0).price).isEqualTo(50000);
+        assertThat(response.get(1).name).isEqualTo("닭가슴살");
+        assertThat(response.get(1).imgPath).isEqualTo("https://unsplash.com/1");
+        assertThat(response.get(1).price).isEqualTo(30000);
+
     }
 
     public static class ItemResponse {
@@ -55,7 +61,6 @@ public class ItemServiceTest {
     }
 
     private class ItemService {
-        //TODO: ItemRepository에서 item List 뽑아와서 ItemResponse List로 변경
         //TODO: ItemRepository findAll -> findList (페이지네이션해서 조회로 변경필요)
         public List<ItemResponse> getList() {
             List<Item> items = itemRepository.findAll();
@@ -82,8 +87,6 @@ public class ItemServiceTest {
     }
     //TODO: 실제 DB에서 조회한 ITEM 반환하도록 변경
     private class ItemRepository {
-        private Long sequence = 0L;
-        private Map<Long, Item> persistence = new HashMap<>();
 
         public List<Item> findAll() {
             return List.of(
