@@ -7,7 +7,10 @@ import org.springframework.util.Assert;
 
 import javax.swing.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -15,10 +18,12 @@ public class ItemServiceTest {
 
 
     private ItemService itemService;
+    private ItemRepository itemRepository;
 
     @BeforeEach
     void setUp() {
         itemService = new ItemService();
+        itemRepository = new ItemRepository();
     }
 
     //TODO 상품조회리스트 테스트 구현
@@ -69,6 +74,19 @@ public class ItemServiceTest {
             this.name = name;
             this.imgPath = imgPath;
             this.price = price;
+        }
+    }
+    //TODO: 실제 DB에서 조회한 ITEM 반환하도록 변경
+    private class ItemRepository {
+        private Long sequence = 0L;
+        private Map<Long, Item> persistence = new HashMap<>();
+
+        public List<Item> findAll() {
+            return List.of(
+                    new Item(1L,"프로틴","https://unsplash.com/2",50000),
+                    new Item(2L,"닭가슴살","https://unsplash.com/1",30000),
+                    new Item(3L,"밀크시슬","https://unsplash.com/3",20000)
+            );
         }
     }
 }
