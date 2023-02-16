@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -35,7 +36,7 @@ public class ItemServiceTest {
         assertThat(response).isNotNull();
     }
 
-    private class ItemResponse {
+    public static class ItemResponse {
         Long id;
         String name;
         String imgPath;
@@ -47,19 +48,22 @@ public class ItemServiceTest {
             this.imgPath = imgPath;
             this.price = price;
         }
+
+        public static ItemResponse toResponse(Item item) {
+            return new ItemResponse(item.id, item.name, item.imgPath, item.price);
+        }
     }
 
     private class ItemService {
         //TODO: ItemRepository에서 item List 뽑아와서 ItemResponse List로 변경
         //TODO: ItemRepository findAll -> findList (페이지네이션해서 조회로 변경필요)
         public List<ItemResponse> getList() {
-            List<Item> item = itemRepository.findAll();
+            List<Item> items = itemRepository.findAll();
 
-            return List.of(
-                   new ItemResponse(1L,"프로틴","https://unsplash.com/2",50000),
-                   new ItemResponse(2L,"닭가슴살","https://unsplash.com/1",30000),
-                   new ItemResponse(3L,"밀크시슬","https://unsplash.com/3",20000)
-            );
+            List<ItemResponse> response = items.stream()
+                    .map(item -> ItemResponse.toResponse(item))
+                    .collect(Collectors.toList());
+            return response;
         }
     }
 
