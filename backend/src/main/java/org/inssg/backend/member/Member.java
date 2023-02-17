@@ -6,10 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -18,8 +15,14 @@ public class Member {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY )
     private Long id;
+
+    @Column(nullable = false, updatable = false, unique = true)
     private String email;
+
+    @Column(length = 50, nullable = false)
     private String password;
+
+    @Column(length = 50, nullable = false)
     private String username;
 
     @Builder

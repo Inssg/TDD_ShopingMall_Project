@@ -17,13 +17,13 @@ public class Item {
     @Column(name = "item_id")
     private Long id;
 
-    @Column(name = "name", nullable = false, length = 50)
+    @Column( nullable = false, length = 50)
     private String name;
 
-    @Column(name = "img_path", nullable = false)
+    @Column( nullable = false)
     private String imgPath;
 
-    @Column(name = "price", nullable = false)
+    @Column( nullable = false)
     private int price;
 
     @Builder
