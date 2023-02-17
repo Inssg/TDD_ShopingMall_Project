@@ -1,9 +1,12 @@
 package org.inssg.backend.member;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import sun.security.krb5.internal.ccache.MemoryCredentialsCache;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MemberApiTest {
 
@@ -11,6 +14,22 @@ public class MemberApiTest {
     private PasswordEncoder passwordEncoder;
     private MemberRepository memberRepository;
 
+    @BeforeEach
+    void setUp() {
+        memberService = new MemberService();
+        memberRepository = new MemberRepository();
+        passwordEncoder = new PasswordEncoder() {
+            @Override
+            public String encode(CharSequence rawPassword) {
+                return rawPassword.toString();
+            }
+
+            @Override
+            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+                return false;
+            }
+        };
+    }
 
     @Test
     @DisplayName("회원가입 테스트")
@@ -22,6 +41,7 @@ public class MemberApiTest {
         MemberCreate memberCreate = new MemberCreate(email, password, username);
 
         memberService.createMember(memberCreate);
+
     }
 
     private class MemberCreate {
@@ -43,7 +63,7 @@ public class MemberApiTest {
         }
     }
 
-    public class Member {
+    public static class Member {
         private Long id;
         private String email;
         private String password;
@@ -55,11 +75,26 @@ public class MemberApiTest {
             this.username = username;
         }
 
-        public Member create(MemberCreate memberCreate, PasswordEncoder passwordEncoder) {
+        public static Member create(MemberCreate memberCreate, PasswordEncoder passwordEncoder) {
             return new Member(memberCreate.email, passwordEncoder.encode(memberCreate.password), memberCreate.username);
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
         }
     }
 
     private class MemberRepository {
+        private Map<Long, Member> persistence = new HashMap<>();
+        private Long sequence = 0L;
+
+        public void save(Member member) {
+            member.setId(++sequence);
+            persistence.put(member.getId(), member);
+        }
     }
 }
