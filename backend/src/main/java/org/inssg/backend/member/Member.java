@@ -32,10 +32,10 @@ public class Member {
         this.username = username;
     }
 
-    public static Member create(MemberCreate memberCreate) {
+    public static Member create(MemberCreate memberCreate, PasswordEncoder passwordEncoder) {
        return  Member.builder()
                 .email(memberCreate.getEmail())
-                .password(memberCreate.getPassword())
+                .password(passwordEncoder.encode(memberCreate.getPassword()))
                 .username(memberCreate.getUsername())
                 .build();
     }

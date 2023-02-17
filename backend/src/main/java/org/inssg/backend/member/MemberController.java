@@ -19,6 +19,7 @@ public class MemberController {
 
     private final MemberService memberService;
 
+
     //회원가입
     @PostMapping("/signup")
     public ResponseEntity create(@RequestBody @Valid MemberCreate memberCreate) {
