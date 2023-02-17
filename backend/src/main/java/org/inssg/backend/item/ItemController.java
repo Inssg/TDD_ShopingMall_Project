@@ -1,6 +1,7 @@
 package org.inssg.backend.item;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +17,6 @@ public class ItemController {
     @GetMapping("/items")
     public ResponseEntity itemList() {
         List<ItemResponse> itemList = itemService.getItemList();
-        return ResponseEntity.ok(itemList);
+        return new ResponseEntity(itemList, HttpStatus.OK);
     }
 }

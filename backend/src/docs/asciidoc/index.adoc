@@ -24,3 +24,19 @@ include::{snippets}/get-itemList/http-response.adoc[]
 .response-fields
 include::{snippets}/get-itemList/response-fields.adoc[]
 
+***
+
+== MemberController
+=== 회원가입
+
+.http-request
+include::{snippets}/post-signUp/http-request.adoc[]
+
+.http-response
+include::{snippets}/post-signUp/http-response.adoc[]
+
+.request-fields
+include::{snippets}/post-signUp/request-fields.adoc[]
+
+.response-fields
+include::{snippets}/post-signUp/response-fields.adoc[]
