@@ -8,6 +8,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class MemberApiTest {
 
     private MemberService memberService;
@@ -34,13 +37,20 @@ public class MemberApiTest {
     @Test
     @DisplayName("회원가입 테스트")
     void 회원가입() {
+        //given
         String email = "abc@gmail.com";
         String password = "test1234!";
         String username = "테스트1";
 
         MemberCreate memberCreate = new MemberCreate(email, password, username);
-
+        //when
         memberService.createMember(memberCreate);
+        //then
+        Member member = memberRepository.persistence.get(1L);
+
+        assertThat(member.email).isEqualTo(email);
+        assertThat(member.username).isEqualTo(username);
+        assertThat(member.password).isEqualTo(password);
 
     }
 
