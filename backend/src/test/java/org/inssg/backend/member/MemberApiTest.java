@@ -39,4 +39,17 @@ public class MemberApiTest {
         }
     }
 
+    private class Member {
+        private Long id;
+        private String email;
+        private String password;
+        private String username;
+
+        public Member(Long id, String email, String password, String username) {
+            this.id = id;
+            this.email = email;
+            this.password = password;
+            this.username = username;
+        }
+    }
 }
