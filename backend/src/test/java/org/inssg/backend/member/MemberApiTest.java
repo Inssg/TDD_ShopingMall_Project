@@ -5,12 +5,15 @@ import org.junit.jupiter.api.Test;
 
 public class MemberApiTest {
 
+    private MemberService memberService;
+
     @Test
     @DisplayName("회원가입 테스트")
     void 회원가입() {
         String email = "abc@gmail.com";
         String password = "test1234!";
         String username = "테스트1";
+
         MemberCreate request = new MemberCreate(email, password, username);
 
         memberService.createMember(request);
@@ -27,4 +30,13 @@ public class MemberApiTest {
             this.username = username;
         }
     }
+
+    private class MemberService {
+        public void createMember(MemberCreate memberCreate) {
+
+           Member member =  memberCreate.toEntity(passwordEncoder);
+           memberRepository.save(member);
+        }
+    }
+
 }
