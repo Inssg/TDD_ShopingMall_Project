@@ -16,5 +16,15 @@ public class MemberApiTest {
         memberService.createMember(request);
     }
 
+    private class MemberCreate {
+        private String email;
+        private String password;
+        private String username;
 
+        public MemberCreate(String email, String password, String username) {
+            this.email = email;
+            this.password = password;
+            this.username = username;
+        }
+    }
 }
