@@ -1,5 +1,6 @@
 package org.inssg.backend.auth;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.io.Decoders;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,8 +10,12 @@ import org.junit.jupiter.api.Test;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class JwtTokenProviderTest {
 
@@ -35,7 +40,7 @@ public class JwtTokenProviderTest {
     @Test
     @DisplayName("AccessToken 정상 발급")
     void generateAccessTokenTest() {
-        HashMap<String, Object> claims = new HashMap<>();
+        Map<String, Object> claims = new HashMap<>();
         claims.put("username", "abc@gmail.com");
         claims.put("roles", "ROLE_USER");
 
@@ -51,6 +56,7 @@ public class JwtTokenProviderTest {
     }
 
     @Test
+    @DisplayName("RefreshToken 정상 발급")
     void generateRefreshTokenTest() {
         String subject = "test refresh Token";
 
@@ -62,8 +68,38 @@ public class JwtTokenProviderTest {
 
         assertThat(refreshToken).isNotNull();
         System.out.println(refreshToken);
-
     }
 
+    @Test
+    @DisplayName("jws 검증 성공")
+    void verifySignatureTest() {
+        String accessToken = getAccessToken(Calendar.MINUTE, 10);
+        assertDoesNotThrow(() -> jwtTokenProvider.verifySignature(accessToken, base64EncodedSecretKey));
+    }
 
+    @Test
+    @DisplayName("Throw ExpiredJwtException when jws verify")
+    void verifyExpirationTest() throws InterruptedException {
+        String accessToken = getAccessToken(Calendar.SECOND, 1);
+
+        assertDoesNotThrow(()->jwtTokenProvider.verifySignature(accessToken,base64EncodedSecretKey));
+
+        TimeUnit.MILLISECONDS.sleep(1500);
+
+        assertThrows(ExpiredJwtException.class, () -> jwtTokenProvider.verifySignature(accessToken, base64EncodedSecretKey));
+    }
+
+    public String getAccessToken(int timeUnit, int timeAmount) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("username", "abc@gmail.com");
+        claims.put("roles", "ROLE_USER");
+
+        String subject = "test access token verify";
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(timeUnit, timeAmount);
+        Date expiration = calendar.getTime();
+        String accessToken = jwtTokenProvider.createAccessToken(claims, subject, expiration, base64EncodedSecretKey);
+
+        return accessToken;
+    }
 }
