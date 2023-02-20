@@ -1,5 +1,6 @@
 package org.inssg.backend.auth;
 
+import io.jsonwebtoken.io.Decoders;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -26,8 +27,14 @@ public class JwtTokenProviderTest {
     }
 
     @Test
+    @DisplayName("Secretkey base64 decode Test")
+    public void encodeBase64SecretKeyTest() {
+        assertThat(secretKey).isEqualTo(new String(Decoders.BASE64.decode(base64EncodedSecretKey)));
+    }
+
+    @Test
     @DisplayName("AccessToken 정상 발급")
-    void test_() {
+    void generateAccessTokenTest() {
         HashMap<String, Object> claims = new HashMap<>();
         claims.put("username", "abc@gmail.com");
         claims.put("roles", "ROLE_USER");
@@ -42,4 +49,21 @@ public class JwtTokenProviderTest {
         assertThat(accessToken).isNotNull();
         System.out.println(accessToken);
     }
+
+    @Test
+    void generateRefreshTokenTest() {
+        String subject = "test refresh Token";
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.add(Calendar.HOUR, 24);
+        Date expiration = calendar.getTime();
+
+        String refreshToken = jwtTokenProvider.createRefreshToken(subject, expiration, base64EncodedSecretKey);
+
+        assertThat(refreshToken).isNotNull();
+        System.out.println(refreshToken);
+
+    }
+
+
 }
