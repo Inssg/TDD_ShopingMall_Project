@@ -1,6 +1,8 @@
 package org.inssg.backend.auth;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -87,6 +89,24 @@ public class JwtTokenProviderTest {
         TimeUnit.MILLISECONDS.sleep(1500);
 
         assertThrows(ExpiredJwtException.class, () -> jwtTokenProvider.verifySignature(accessToken, base64EncodedSecretKey));
+    }
+
+    @Test
+    @DisplayName("AccessToken claims 내용 확인")
+    void checkClaimsTest() {
+        String accessToken = getAccessToken(Calendar.MINUTE, 1);
+
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(jwtTokenProvider.getKeyFromBase64EncodedKey(base64EncodedSecretKey))
+                .build()
+                .parseClaimsJws(accessToken)
+                .getBody();
+
+        String username = claims.get("username", String.class);
+        String roles = claims.get("roles",String.class);
+
+        assertThat(username).isEqualTo("abc@gmail.com");
+        assertThat(roles).isEqualTo("ROLE_USER");
     }
 
     public String getAccessToken(int timeUnit, int timeAmount) {
