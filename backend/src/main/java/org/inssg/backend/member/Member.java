@@ -25,6 +25,9 @@ public class Member {
     @Column(length = 50, nullable = false)
     private String username;
 
+    @Enumerated(EnumType.STRING)
+    private Authority authority = Authority.ROLE_USER;
+
     @Builder
     public Member(String email, String password, String username) {
         this.email = email;

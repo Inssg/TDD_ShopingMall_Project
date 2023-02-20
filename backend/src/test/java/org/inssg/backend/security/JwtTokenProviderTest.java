@@ -1,10 +1,9 @@
-package org.inssg.backend.auth;
+package org.inssg.backend.security;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,7 +50,7 @@ public class JwtTokenProviderTest {
         calendar.add(Calendar.MINUTE, 10);
         Date expiration = calendar.getTime();
 
-        String accessToken = jwtTokenProvider.createAccessToken(claims, subject, expiration,base64EncodedSecretKey);
+        String accessToken = jwtTokenProvider.accessTokenAssembly(claims, subject, expiration,base64EncodedSecretKey);
 
         assertThat(accessToken).isNotNull();
         System.out.println(accessToken);
@@ -66,7 +65,7 @@ public class JwtTokenProviderTest {
         calendar.add(Calendar.HOUR, 24);
         Date expiration = calendar.getTime();
 
-        String refreshToken = jwtTokenProvider.createRefreshToken(subject, expiration, base64EncodedSecretKey);
+        String refreshToken = jwtTokenProvider.refreshTokenAssembly(subject, expiration, base64EncodedSecretKey);
 
         assertThat(refreshToken).isNotNull();
         System.out.println(refreshToken);
@@ -118,7 +117,7 @@ public class JwtTokenProviderTest {
         Calendar calendar = Calendar.getInstance();
         calendar.add(timeUnit, timeAmount);
         Date expiration = calendar.getTime();
-        String accessToken = jwtTokenProvider.createAccessToken(claims, subject, expiration, base64EncodedSecretKey);
+        String accessToken = jwtTokenProvider.accessTokenAssembly(claims, subject, expiration, base64EncodedSecretKey);
 
         return accessToken;
     }
