@@ -16,7 +16,5 @@ public class MemberAuthenticationSuccessHandler implements AuthenticationSuccess
         log.info("# Authenticated successfully!");
         log.info("AccessToken = {}", response.getHeader("Authorization"));
         log.info("RefreshToken = {}", response.getHeader("RefreshToken"));
-        log.info("username = {}", authentication.getPrincipal());
-
     }
 }

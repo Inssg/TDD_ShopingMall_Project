@@ -1,6 +1,7 @@
 package org.inssg.backend.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.inssg.backend.error.BusinessLogicException;
 import org.inssg.backend.member.Member;
 import org.inssg.backend.member.MemberCreate;
 import org.inssg.backend.member.MemberRepository;
@@ -14,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.web.client.HttpClientErrorException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -62,13 +64,13 @@ public class AuthApiTest {
     }
 
     @Test
-    @DisplayName("로그인 실패 - 존재하지 않는 email")
+    @DisplayName("로그인 실패 - 존재하지 않는 계정")
     void test_login_NotExistEmail() throws Exception {
 
         ResultActions actions = mockMvc.perform(post("/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(loginDto)))
-                .andExpect((result -> assertTrue(result.getResolvedException().getClass().isAssignableFrom(NullPointerException.class))));
+                .andExpect(status().isUnauthorized());
     }
 }
