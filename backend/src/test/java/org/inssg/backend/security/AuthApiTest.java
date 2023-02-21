@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.inssg.backend.member.Member;
 import org.inssg.backend.member.MemberCreate;
 import org.inssg.backend.member.MemberRepository;
+import org.inssg.backend.security.dto.LoginDto;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

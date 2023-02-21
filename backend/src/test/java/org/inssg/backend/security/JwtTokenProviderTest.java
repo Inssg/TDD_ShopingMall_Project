@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
+import org.inssg.backend.security.jwt.JwtTokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -75,7 +76,7 @@ public class JwtTokenProviderTest {
     @DisplayName("jws 검증 성공")
     void verifySignatureTest() {
         String accessToken = getAccessToken(Calendar.MINUTE, 10);
-        assertDoesNotThrow(() -> jwtTokenProvider.verifySignature(accessToken, base64EncodedSecretKey));
+        assertDoesNotThrow(() -> jwtTokenProvider.getClaims(accessToken, base64EncodedSecretKey));
     }
 
     @Test
@@ -83,11 +84,11 @@ public class JwtTokenProviderTest {
     void verifyExpirationTest() throws InterruptedException {
         String accessToken = getAccessToken(Calendar.SECOND, 1);
 
-        assertDoesNotThrow(()->jwtTokenProvider.verifySignature(accessToken,base64EncodedSecretKey));
+        assertDoesNotThrow(()->jwtTokenProvider.getClaims(accessToken,base64EncodedSecretKey));
 
         TimeUnit.MILLISECONDS.sleep(1500);
 
-        assertThrows(ExpiredJwtException.class, () -> jwtTokenProvider.verifySignature(accessToken, base64EncodedSecretKey));
+        assertThrows(ExpiredJwtException.class, () -> jwtTokenProvider.getClaims(accessToken, base64EncodedSecretKey));
     }
 
     @Test

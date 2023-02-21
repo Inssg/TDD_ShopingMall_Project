@@ -1,4 +1,4 @@
-package org.inssg.backend.security;
+package org.inssg.backend.security.dto;
 
 import lombok.AccessLevel;
 import lombok.Builder;

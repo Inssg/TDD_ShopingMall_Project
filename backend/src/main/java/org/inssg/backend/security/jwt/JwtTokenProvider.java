@@ -1,9 +1,12 @@
-package org.inssg.backend.security;
+package org.inssg.backend.security.jwt;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
 import org.inssg.backend.member.Member;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,6 +18,7 @@ import java.util.*;
 @Component
 public class JwtTokenProvider {
 
+    @Getter
     @Value("${JWT_SECRET_KEY}")
     private String secretKey;
 
@@ -72,14 +76,15 @@ public class JwtTokenProvider {
                 .signWith(key)
                 .compact();
     }
-
-    public void verifySignature(String jws, String base64EncodedSecretKey) {
+    //토큰 검증후 claim 반환
+    public Jws<Claims>  getClaims(String jws, String base64EncodedSecretKey) {
         Key key = getKeyFromBase64EncodedKey(base64EncodedSecretKey);
 
-        Jwts.parserBuilder()
+        Jws<Claims> claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(jws);
+        return claims;
     }
 
     public String createAccessToken(Member member) {
