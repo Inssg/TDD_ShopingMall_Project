@@ -28,6 +28,6 @@ public class MemberService {
 
 
     private Member findMember(String email) {
-        return memberRepository.findByEmail(email).orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+        return memberRepository.findByEmail(email).orElseThrow(() -> new MemberNotFound());
     }
 }

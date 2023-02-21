@@ -50,10 +50,10 @@ public class ErrorResponse {
                 .build();
     }
 
-    public static ErrorResponse of(HttpStatus httpStatus) {
+    public static ErrorResponse of(HttpStatus httpStatus, String errorMessage) {
         return ErrorResponse.businessExceptionBuilder()
                 .status(httpStatus.value())
-                .message(httpStatus.getReasonPhrase())
+                .message(errorMessage)
                 .build();
 
     }

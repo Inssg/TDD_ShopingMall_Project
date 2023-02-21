@@ -5,6 +5,7 @@ import org.inssg.backend.error.BusinessLogicException;
 import org.inssg.backend.error.ErrorResponse;
 import org.inssg.backend.error.ExceptionCode;
 import org.inssg.backend.member.Member;
+import org.inssg.backend.member.MemberNotFound;
 import org.inssg.backend.member.MemberRepository;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,7 +21,7 @@ public class MemberDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = memberRepository.findByEmail(username).orElseThrow(() -> new BusinessLogicException(ExceptionCode.MEMBER_NOT_FOUND));
+        Member member = memberRepository.findByEmail(username).orElseThrow(() -> new MemberNotFound());
         return MemberDetails.of(member);
     }
 }
