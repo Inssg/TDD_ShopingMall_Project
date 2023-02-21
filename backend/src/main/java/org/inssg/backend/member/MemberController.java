@@ -19,7 +19,7 @@ public class MemberController {
 
     private final MemberService memberService;
 
-
+    //Todo: authorityUtils 추가 필요
     //회원가입
     @PostMapping("/signup")
     public ResponseEntity create(@RequestBody @Valid MemberCreate memberCreate) {

@@ -19,7 +19,7 @@ public class Member {
     @Column(nullable = false, updatable = false, unique = true)
     private String email;
 
-    @Column(length = 50, nullable = false)
+    @Column(nullable = false)
     private String password;
 
     @Column(length = 50, nullable = false)
@@ -28,7 +28,8 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Authority authority = Authority.ROLE_USER;
 
-    @Builder
+    //부모의 Builder와 자식의 Builder 간의 이름이 동일하여 충돌이 발생할 수 있으므로 이에 대해 각각 이름을 지정해주려 할 때 사용
+    @Builder(builderMethodName = "createBuilder")
     public Member(String email, String password, String username) {
         this.email = email;
         this.password = password;
@@ -36,7 +37,7 @@ public class Member {
     }
 
     public static Member create(MemberCreate memberCreate, PasswordEncoder passwordEncoder) {
-       return  Member.builder()
+       return  Member.createBuilder()
                 .email(memberCreate.getEmail())
                 .password(passwordEncoder.encode(memberCreate.getPassword()))
                 .username(memberCreate.getUsername())
