@@ -1,6 +1,7 @@
 package org.inssg.backend.security.filter;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,7 @@ public class JwtVerificationFilter extends OncePerRequestFilter { //request당 �
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberDetailsService memberDetailsService;
 
+    //Todo: JwtTokenProvider getClaims에서 Excetption Throw 하는 선택지도있다.
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
@@ -35,8 +37,10 @@ public class JwtVerificationFilter extends OncePerRequestFilter { //request당 �
             request.setAttribute("exception", se);
         } catch (ExpiredJwtException ee) {
             request.setAttribute("exception", ee);
+        } catch (MalformedJwtException me) {
+            request.setAttribute("exception", me);
         } catch (Exception e) {
-            request.setAttribute("exception",e);
+            request.setAttribute("exception", e);
         }
 
         filterChain.doFilter(request,response);
