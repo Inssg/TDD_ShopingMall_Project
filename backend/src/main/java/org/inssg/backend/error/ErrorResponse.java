@@ -55,7 +55,9 @@ public class ErrorResponse {
                 .status(httpStatus.value())
                 .message(errorMessage)
                 .build();
-
+    }
+    public static ErrorResponse of(HttpStatus httpStatus) {
+        return new ErrorResponse(httpStatus.value(), httpStatus.getReasonPhrase());
     }
 
 

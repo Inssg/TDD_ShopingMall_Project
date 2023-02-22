@@ -42,7 +42,8 @@ public class MemberAuthenticationFailureHandler implements AuthenticationFailure
 
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        ErrorResponse errorResponse = ErrorResponse.of(HttpStatus.UNAUTHORIZED, errorMessage);
+
+        ErrorResponse errorResponse = errorMessage != null ? ErrorResponse.of(HttpStatus.UNAUTHORIZED, errorMessage) : ErrorResponse.of(HttpStatus.UNAUTHORIZED);
         response.setCharacterEncoding("UTF-8"); //response 한글깨짐 방지
         response.getWriter().write(mapper.writeValueAsString(errorResponse));
     }

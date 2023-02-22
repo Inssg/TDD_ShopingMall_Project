@@ -42,7 +42,7 @@ public class MemberApiTest {
     @MockBean
     private MemberService memberService;
 
-    //Todo ApiTest로 변경
+
     @Test
     @DisplayName("회원가입")
     @WithMockUser
