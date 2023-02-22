@@ -5,9 +5,10 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import org.inssg.backend.security.jwt.JwtTokenProvider;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -19,18 +20,19 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class JwtTokenProviderTest {
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
 
-    private JwtTokenProvider jwtTokenProvider;
     private String secretKey;
     private String base64EncodedSecretKey;
 
-    @BeforeEach
+    @BeforeAll
     void init() {
-        jwtTokenProvider = new JwtTokenProvider();
-        secretKey = "ksjdfiojiow1k12ji124y12746y!!@33";
-        base64EncodedSecretKey = jwtTokenProvider.encodedBase64SecretKey(secretKey);
-
+        secretKey = jwtTokenProvider.getSecretKey();
+        base64EncodedSecretKey= jwtTokenProvider.encodedBase64SecretKey(secretKey);
     }
 
     @Test
@@ -76,7 +78,7 @@ public class JwtTokenProviderTest {
     @DisplayName("jws 검증 성공")
     void verifySignatureTest() {
         String accessToken = getAccessToken(Calendar.MINUTE, 10);
-        assertDoesNotThrow(() -> jwtTokenProvider.getClaims(accessToken, base64EncodedSecretKey));
+        assertDoesNotThrow(() -> jwtTokenProvider.getClaims(accessToken));
     }
 
     @Test
@@ -84,11 +86,11 @@ public class JwtTokenProviderTest {
     void verifyExpirationTest() throws InterruptedException {
         String accessToken = getAccessToken(Calendar.SECOND, 1);
 
-        assertDoesNotThrow(()->jwtTokenProvider.getClaims(accessToken,base64EncodedSecretKey));
+        assertDoesNotThrow(()->jwtTokenProvider.getClaims(accessToken));
 
         TimeUnit.MILLISECONDS.sleep(1500);
 
-        assertThrows(ExpiredJwtException.class, () -> jwtTokenProvider.getClaims(accessToken, base64EncodedSecretKey));
+        assertThrows(ExpiredJwtException.class, () -> jwtTokenProvider.getClaims(accessToken));
     }
 
     @Test

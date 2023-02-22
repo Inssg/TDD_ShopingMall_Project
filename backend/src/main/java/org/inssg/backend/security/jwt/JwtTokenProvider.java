@@ -1,9 +1,6 @@
 package org.inssg.backend.security.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
@@ -101,16 +98,28 @@ public class JwtTokenProvider {
     }
 
     //토큰 검증후 claim 반환
-    public Jws<Claims>  getClaims(String jws, String base64EncodedSecretKey) {
-        Key key = getKeyFromBase64EncodedKey(base64EncodedSecretKey);
+    public Jws<Claims>  getClaims(String jws) {
+        Key key = getKeyFromBase64EncodedKey(encodedBase64SecretKey(secretKey));
 
             Jws<Claims> claims = Jwts.parserBuilder()
                     .setSigningKey(key)
                     .build()
                     .parseClaimsJws(jws);
             return claims;
-
     }
 
+    public String getEmailFromRefreshToken(String refreshToken)  {
+        Key key = getKeyFromBase64EncodedKey(encodedBase64SecretKey(secretKey));
+        try {
+            Jws<Claims> claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(refreshToken);
+            return claims.getBody().getSubject();
+        } catch (JwtException e) {
+            throw new JwtException(e.getMessage());
+        }
+
+    }
 
 }

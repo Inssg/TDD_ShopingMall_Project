@@ -54,8 +54,7 @@ public class JwtVerificationFilter extends OncePerRequestFilter { //request당 �
     // 토큰을 검증하고 클레임생성
     private Map<String, Object> verifyJws(HttpServletRequest request) {
         String accessToken = request.getHeader("Authorization").substring(7);
-        String base64encodedSecretKey = jwtTokenProvider.encodedBase64SecretKey(jwtTokenProvider.getSecretKey());
-        Map<String, Object> claims = jwtTokenProvider.getClaims(accessToken, base64encodedSecretKey).getBody();
+        Map<String, Object> claims = jwtTokenProvider.getClaims(accessToken).getBody();
         return claims;
     }
 
