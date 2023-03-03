@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class JwtTokenProviderTest {
+
     @Autowired
     JwtTokenProvider jwtTokenProvider;
 

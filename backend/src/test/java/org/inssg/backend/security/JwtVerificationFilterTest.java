@@ -99,7 +99,6 @@ public class JwtVerificationFilterTest {
 
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
         verify(mockFilterChain, times(1)).doFilter(requestWithoutToken,mockResponse);
-
     }
 
     @Test

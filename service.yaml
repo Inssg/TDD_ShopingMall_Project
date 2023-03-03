@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tdd-shoppingmall-project
+  labels:
+    app: tdd-shoppingmall-project
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tdd-shoppingmall-project
+  template:
+    metadata:
+      labels:
+        app: tdd-shoppingmall-project
+    spec:
+      containers:
+        - name: springboot-app
+          image: 828222123266.dkr.ecr.ap-northeast-2.amazonaws.com/tdd_shoppingmall_project:IMAGE_VERSION
+          imagePullPolicy: Always
+          ports:
+            -containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tdd-shoppingmall-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: tdd-shoppingmall-project
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
