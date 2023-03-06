@@ -21,7 +21,7 @@ public class AuthService {
   private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
-    private RedisService redisService;
+    private final RedisService redisService;
 
 
     public Map<String, Object> reissue(String accessTokenValue, String refreshTokenValue) {

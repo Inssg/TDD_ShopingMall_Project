@@ -4,6 +4,7 @@ import org.inssg.backend.member.Member;
 import org.inssg.backend.member.MemberCreate;
 import org.inssg.backend.member.MemberRepository;
 import org.inssg.backend.security.jwt.JwtTokenProvider;
+import org.inssg.backend.security.redis.RedisService;
 import org.inssg.backend.security.refreshtoken.RefreshToken;
 import org.inssg.backend.security.refreshtoken.RefreshTokenRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Map;
@@ -35,6 +38,9 @@ public class AuthServiceTest {
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
+
     String accessToken;
     String refreshToken;
     String email;
@@ -56,6 +62,7 @@ public class AuthServiceTest {
         refreshToken = jwtTokenProvider.createRefreshToken(member);
         RefreshToken token = RefreshToken.builder().email(email).value(refreshToken).build();
         refreshTokenRepository.save(token);
+
     }
 
     @Test
@@ -73,10 +80,12 @@ public class AuthServiceTest {
     //Todo: Redis 활용 로그아웃 기능 구현 필요
     @Test
     void test_logout() {
+        ValueOperations<String, String> values = redisTemplate.opsForValue();
+        values.set(email, refreshToken);
         authService.logout(accessToken, refreshToken);
-        //기대하는것 로그아웃 후, 레디스에서 refresthToken 조회시 없음
-        //레디스에 로그아웃한 accesstoken 정상적으로 블랙리스트에 추가도있는지
-        //블랙리스트 accessToken으로 로그인 시도하면,
+
+        assertThat(values.get(email)).isNull();
+        assertThat(values.get(accessToken)).isEqualTo("BlackList");
     }
 
 }
