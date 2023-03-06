@@ -28,7 +28,10 @@ public class AuthService {
         HashMap<String, Object> reissuedToken = new HashMap<>();
         String email = jwtTokenProvider.getEmailFromRefreshToken(refreshTokenValue);
 
-        RefreshToken refreshToken = refreshTokenRepository.findByKey(email).orElseThrow(() -> new TokenNotExist());
+//        RefreshToken refreshToken = refreshTokenRepository.findByKey(email).orElseThrow(() -> new TokenNotExist());
+
+
+
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new MemberNotFound());
 
         if (!refreshToken.getValue().equals(refreshTokenValue)) {
@@ -39,8 +42,8 @@ public class AuthService {
         reissuedToken.put("accessToken", newAccessToken);
         reissuedToken.put("refreshToken", newRefreshToken);
 
-        refreshToken.updateValue(newRefreshToken);
-        refreshTokenRepository.save(refreshToken);
+//        refreshToken.updateValue(newRefreshToken);
+//        refreshTokenRepository.save(refreshToken);
 
         return reissuedToken;
     }

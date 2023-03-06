@@ -20,9 +20,11 @@ public class JwtTokenProvider {
     @Value("${jwt.key}")
     private String secretKey;
 
+    @Getter
     @Value("${jwt.access-token-expiration-minutes}")
     private int accessTokenExpirationMinutes;
 
+    @Getter
     @Value("${jwt.refresh-token-expiration-minutes}")
     private int refreshTokenExpirationMinutes;
 

@@ -6,6 +6,7 @@ import lombok.SneakyThrows;
 import org.inssg.backend.member.Member;
 import org.inssg.backend.security.jwt.JwtTokenProvider;
 import org.inssg.backend.security.dto.LoginDto;
+import org.inssg.backend.security.redis.RedisService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,6 +25,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RedisService redisService;
 
 
     @SneakyThrows
@@ -45,6 +47,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         String accessToken = jwtTokenProvider.createAccessToken(member);
         String refreshToken = jwtTokenProvider.createRefreshToken(member);
+
+        // 인증 성공시 RefreshToken Redis에 저장(expiration 설정을 통해 자동 삭제 처리)
+        redisService.setValues(member.getEmail(), refreshToken, jwtTokenProvider.getRefreshTokenExpirationMinutes());
 
         response.setHeader("Authorization", "Bearer " + accessToken);
         response.setHeader("RefreshToken", refreshToken);

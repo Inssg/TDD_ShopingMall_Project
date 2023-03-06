@@ -82,11 +82,14 @@ public class AuthServiceTest {
     void test_logout() {
         ValueOperations<String, String> values = redisTemplate.opsForValue();
         values.set(email, refreshToken);
+        assertThat(values.get(email)).isNotNull();
+
         authService.logout(accessToken, refreshToken);
 
         assertThat(values.get(email)).isNull();
         assertThat(values.get(accessToken)).isEqualTo("BlackList");
     }
+
 
 }
 

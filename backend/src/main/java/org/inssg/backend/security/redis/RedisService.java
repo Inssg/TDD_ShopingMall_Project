@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisService {
     private final RedisTemplate<String, String> redisTemplate;
 
+
     //Redis 에서 해당 User email로 저장된 RefreshToken 삭제
     public void deleteValues(String key) {
         redisTemplate.delete(key);
@@ -21,5 +22,15 @@ public class RedisService {
     public void setBlackListValues(String key, String data, Long expiration) {
         ValueOperations<String, String> values = redisTemplate.opsForValue();
         values.set(key,data,expiration, TimeUnit.MILLISECONDS);
+    }
+
+    public void setValues(String key, String data, int expiration) {
+        ValueOperations<String, String> values = redisTemplate.opsForValue();
+        values.set(key, data, (long)expiration, TimeUnit.MILLISECONDS);
+    }
+
+    public String getValues(String key) {
+        ValueOperations<String, String> values = redisTemplate.opsForValue();
+        return values.get(key);
     }
 }

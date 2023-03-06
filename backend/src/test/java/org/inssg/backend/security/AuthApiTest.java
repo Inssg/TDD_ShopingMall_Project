@@ -1,5 +1,6 @@
 package org.inssg.backend.security;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.inssg.backend.member.Member;
 import org.inssg.backend.member.MemberCreate;
@@ -9,12 +10,14 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -29,6 +32,9 @@ public class AuthApiTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -104,5 +110,18 @@ public class AuthApiTest {
                 .andExpect(jsonPath("$.message").value("아이디나 비밀번호가 맞지 않습니다. 다시 확인해 주십십오."));
     }
 
+    @Test
+    @DisplayName("로그인 성공시, Redis에 refreshToken 저장")
+    void test_login_storeRefreshTokenInRedis() throws Exception {
+
+        mockMvc.perform(post("/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(loginDto)))
+                .andExpect(status().isOk());
+
+        assertThat(redisTemplate.opsForValue().get(loginDto.getUsername())).isNotNull();
+
+    }
 
 }
