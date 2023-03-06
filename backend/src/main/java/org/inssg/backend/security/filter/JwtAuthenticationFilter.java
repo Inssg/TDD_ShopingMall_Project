@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.inssg.backend.member.Member;
+import org.inssg.backend.security.MemberAlreadyLoggedIn;
 import org.inssg.backend.security.jwt.JwtTokenProvider;
 import org.inssg.backend.security.dto.LoginDto;
 import org.inssg.backend.security.redis.RedisService;
@@ -34,6 +35,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         //LoginDto 클래스로 역직렬화
         ObjectMapper mapper = new ObjectMapper();
         LoginDto loginDto = mapper.readValue(request.getInputStream(), LoginDto.class);
+
+        if(redisService.getValues(loginDto.getUsername()) != null){
+            throw new MemberAlreadyLoggedIn();
+        }
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
         //authenticationManager 에게 인증위임
