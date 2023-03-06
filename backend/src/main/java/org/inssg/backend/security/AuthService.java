@@ -5,6 +5,7 @@ import org.inssg.backend.member.Member;
 import org.inssg.backend.member.MemberNotFound;
 import org.inssg.backend.member.MemberRepository;
 import org.inssg.backend.security.jwt.JwtTokenProvider;
+import org.inssg.backend.security.redis.RedisService;
 import org.inssg.backend.security.refreshtoken.RefreshToken;
 import org.inssg.backend.security.refreshtoken.RefreshTokenRepository;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class AuthService {
   private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
+    private RedisService redisService;
 
 
     public Map<String, Object> reissue(String accessTokenValue, String refreshTokenValue) {
@@ -41,5 +43,14 @@ public class AuthService {
         refreshTokenRepository.save(refreshToken);
 
         return reissuedToken;
+    }
+
+    public void logout(String accessTokenValue, String refreshTokenValue) {
+        String email = jwtTokenProvider.getEmailFromRefreshToken(refreshTokenValue);
+        Long untilExpiration = jwtTokenProvider.calExpDuration(accessTokenValue);
+
+        redisService.deleteValues(email);
+        redisService.setBlackListValues(accessTokenValue, "BlackList", untilExpiration);
+
     }
 }

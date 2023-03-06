@@ -122,4 +122,13 @@ public class JwtTokenProvider {
 
     }
 
+    //getCliams() 호출하여 파싱한 후, 만료시간에서 현재시간을 뺀 시간 계산
+    public Long calExpDuration(String jws) {
+
+        Date expiration = getClaims(jws).getBody().getExpiration();
+        long now = new Date().getTime();
+
+        return expiration.getTime() - now;
+    }
+
 }

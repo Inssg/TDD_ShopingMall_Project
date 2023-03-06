@@ -73,7 +73,10 @@ public class AuthServiceTest {
     //Todo: Redis 활용 로그아웃 기능 구현 필요
     @Test
     void test_logout() {
-
+        authService.logout(accessToken, refreshToken);
+        //기대하는것 로그아웃 후, 레디스에서 refresthToken 조회시 없음
+        //레디스에 로그아웃한 accesstoken 정상적으로 블랙리스트에 추가도있는지
+        //블랙리스트 accessToken으로 로그인 시도하면,
     }
 
 }
