@@ -5,7 +5,9 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.inssg.backend.security.TokenNotValid;
 import org.inssg.backend.security.jwt.JwtTokenProvider;
+import org.inssg.backend.security.redis.RedisService;
 import org.inssg.backend.security.userdetails.MemberDetails;
 import org.inssg.backend.security.userdetails.MemberDetailsService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,13 +27,19 @@ import java.util.Map;
 public class JwtVerificationFilter extends OncePerRequestFilter { //request당 한번만 실행
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberDetailsService memberDetailsService;
+    private final RedisService redisService;
 
     //Todo: JwtTokenProvider getClaims에서 Excetption Throw 하는 선택지도있다.
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            Map<String, Object> claims = verifyJws(request);
+            String accessToken = request.getHeader("Authorization").substring(7);
+            Map<String, Object> claims = verifyJws(request,accessToken);
+
+            if (redisService.hasKeyBlackList(accessToken)) {
+                throw new TokenNotValid();
+            }
             setAuthenticationToContext(claims);
         } catch (SignatureException se) {
             request.setAttribute("exception", se);
@@ -52,8 +60,7 @@ public class JwtVerificationFilter extends OncePerRequestFilter { //request당 �
         return authorization == null || !authorization.startsWith("Bearer");
     }
     // 토큰을 검증하고 클레임생성
-    private Map<String, Object> verifyJws(HttpServletRequest request) {
-        String accessToken = request.getHeader("Authorization").substring(7);
+    private Map<String, Object> verifyJws(HttpServletRequest request, String accessToken) {
         Map<String, Object> claims = jwtTokenProvider.getClaims(accessToken).getBody();
         return claims;
     }

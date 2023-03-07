@@ -8,6 +8,7 @@ import org.inssg.backend.security.jwt.JwtTokenProvider;
 import org.inssg.backend.security.filter.JwtAuthenticationFilter;
 import org.inssg.backend.security.handler.MemberAuthenticationFailureHandler;
 import org.inssg.backend.security.handler.MemberAuthenticationSuccessHandler;
+import org.inssg.backend.security.redis.RedisService;
 import org.inssg.backend.security.userdetails.MemberDetails;
 import org.inssg.backend.security.userdetails.MemberDetailsService;
 import org.springframework.context.annotation.Bean;
@@ -37,6 +38,7 @@ public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberDetailsService memberDetailsService;
+    private final RedisService redisService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -84,11 +86,11 @@ public class SecurityConfig {
         @Override
         public void configure(HttpSecurity builder) throws Exception {
             AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
-            JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtTokenProvider);
+            JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtTokenProvider,redisService);
             jwtAuthenticationFilter.setAuthenticationSuccessHandler(new MemberAuthenticationSuccessHandler());
             jwtAuthenticationFilter.setAuthenticationFailureHandler(new MemberAuthenticationFailureHandler());
 
-            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenProvider, memberDetailsService);
+            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtTokenProvider, memberDetailsService,redisService);
 
             builder
                     .addFilter(jwtAuthenticationFilter)

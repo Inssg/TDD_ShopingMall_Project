@@ -7,6 +7,7 @@ import org.inssg.backend.member.Member;
 import org.inssg.backend.member.MemberCreate;
 import org.inssg.backend.security.filter.JwtVerificationFilter;
 import org.inssg.backend.security.jwt.JwtTokenProvider;
+import org.inssg.backend.security.redis.RedisService;
 import org.inssg.backend.security.userdetails.MemberDetails;
 import org.inssg.backend.security.userdetails.MemberDetailsService;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,6 +52,9 @@ public class JwtVerificationFilterTest {
     @Autowired
     JwtTokenProvider jwtTokenProvider;
 
+    @Autowired
+    RedisService redisService;
+
     MemberDetails memberDetails;
 
     String email = "abc@gmail.com";
@@ -65,7 +69,7 @@ public class JwtVerificationFilterTest {
         mockFilterChain = Mockito.mock(FilterChain.class);
         passwordEncoder = new BCryptPasswordEncoder();
         mockMemberDetailsService = mock(MemberDetailsService.class);
-        jwtVerificationFilter = new JwtVerificationFilter(jwtTokenProvider, mockMemberDetailsService);
+        jwtVerificationFilter = new JwtVerificationFilter(jwtTokenProvider, mockMemberDetailsService,redisService);
 
         MemberCreate memberCreate = new MemberCreate(email, password, username);
         member = Member.create(memberCreate, passwordEncoder);

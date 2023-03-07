@@ -1,12 +1,12 @@
-package org.inssg.backend.security;
+package org.inssg.backend.security.service;
 
 import lombok.RequiredArgsConstructor;
 import org.inssg.backend.member.Member;
 import org.inssg.backend.member.MemberNotFound;
 import org.inssg.backend.member.MemberRepository;
+import org.inssg.backend.security.TokenNotValid;
 import org.inssg.backend.security.jwt.JwtTokenProvider;
-import org.inssg.backend.security.refreshtoken.RefreshToken;
-import org.inssg.backend.security.refreshtoken.RefreshTokenRepository;
+import org.inssg.backend.security.redis.RedisService;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -17,29 +17,39 @@ import java.util.Map;
 @Transactional
 public class AuthService {
 
-  private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository;
+    private final RedisService redisService;
 
 
-    public Map<String, Object> reissue(String accessTokenValue, String refreshTokenValue) {
-        HashMap<String, Object> reissuedToken = new HashMap<>();
+    public Map<String, String> reissue(String refreshTokenValue) {
+        HashMap<String, String> reissuedToken = new HashMap<>();
         String email = jwtTokenProvider.getEmailFromRefreshToken(refreshTokenValue);
 
-        RefreshToken refreshToken = refreshTokenRepository.findByKey(email).orElseThrow(() -> new TokenNotExist());
+        String refreshToken = redisService.getValues(email);
         Member member = memberRepository.findByEmail(email).orElseThrow(() -> new MemberNotFound());
 
-        if (!refreshToken.getValue().equals(refreshTokenValue)) {
-            throw new TokenNotAccord();
+        if (!refreshToken.equals(refreshTokenValue) || refreshToken.isEmpty() ) {
+            throw new TokenNotValid();
         }
         String newAccessToken = jwtTokenProvider.createAccessToken(member);
         String newRefreshToken = jwtTokenProvider.createRefreshToken(member);
         reissuedToken.put("accessToken", newAccessToken);
         reissuedToken.put("refreshToken", newRefreshToken);
 
-        refreshToken.updateValue(newRefreshToken);
-        refreshTokenRepository.save(refreshToken);
+        //refreshToken Redis 업데이트
+        redisService.setValues(email,newRefreshToken,jwtTokenProvider.getRefreshTokenExpirationMinutes());
 
         return reissuedToken;
     }
+
+    public void logout(String accessTokenValue, String refreshTokenValue) {
+        String email = jwtTokenProvider.getEmailFromRefreshToken(refreshTokenValue);
+        Long untilExpiration = jwtTokenProvider.calExpDuration(accessTokenValue);
+
+        redisService.deleteValues(email);
+        redisService.setBlackListValues(accessTokenValue, "BlackList", untilExpiration);
+
+    }
 }
+
