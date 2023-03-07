@@ -83,6 +83,7 @@ public class AuthServiceTest {
 
         assertThat(values.get(email)).isNull();
         assertThat(values.get(accessToken)).isEqualTo("BlackList");
+
     }
 
 

@@ -18,9 +18,8 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/logiout")
+    @PostMapping("/member/logout")
     public ResponseEntity logout(HttpServletRequest request) {
-
         String accessToken = request.getHeader("Authorization").substring(7);
         String refreshToken = request.getHeader("RefreshToken");
 

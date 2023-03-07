@@ -7,19 +7,27 @@ import org.inssg.backend.member.MemberCreate;
 import org.inssg.backend.member.MemberRepository;
 import org.inssg.backend.security.dto.LoginDto;
 import org.inssg.backend.security.jwt.JwtTokenProvider;
+import org.inssg.backend.security.redis.RedisService;
+import org.inssg.backend.security.service.AuthService;
 import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockFilterChain;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -42,6 +50,9 @@ public class AuthApiTest {
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+
+    @MockBean
+    private AuthService authService;
 
     @Autowired
     private ObjectMapper mapper;
@@ -133,22 +144,24 @@ public class AuthApiTest {
         assertThat(redisTemplate.opsForValue().get(loginDto.getUsername())).isNotNull();
 
     }
-
+    //Todo: 시큐리티 RestDocs 작업
     @Test
     @DisplayName("로그아웃 테스트")
     void test_logout() throws Exception {
         //given
-        redisTemplate.opsForValue().set(loginDto.getUsername(),refreshToken);
+        doNothing().when(authService).logout(Mockito.anyString(), Mockito.anyString());
 
-        mockMvc.perform(post("/logout")
+                mockMvc.perform(post("/member/logout")
                         .header("Authorization", "Bearer" + accessToken)
                         .header("RefreshToken", refreshToken)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-
-        assertThat(redisTemplate.opsForValue().get(loginDto.getUsername())).isNull();
-        assertThat(redisTemplate.opsForValue().get(accessToken)).isEqualTo("BlackList");
     }
+
+    @Test
+    @DisplayName("토큰 재발급 테스트")
+
+
 
 }
