@@ -6,6 +6,7 @@ import org.inssg.backend.member.Member;
 import org.inssg.backend.member.MemberCreate;
 import org.inssg.backend.member.MemberRepository;
 import org.inssg.backend.security.dto.LoginDto;
+import org.inssg.backend.security.jwt.JwtTokenProvider;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -40,12 +41,18 @@ public class AuthApiTest {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
     private ObjectMapper mapper;
 
     LoginDto loginDto = LoginDto.builder()
             .username("abc@gmail.com")
             .password("1234")
             .build();
+
+    String accessToken;
+    String refreshToken;
 
     @BeforeAll
     void setUp() {
@@ -57,6 +64,9 @@ public class AuthApiTest {
         MemberCreate memberCreate = new MemberCreate(email, password, username);
         Member member = Member.create(memberCreate, passwordEncoder);
         memberRepository.save(member);
+
+        accessToken = jwtTokenProvider.createAccessToken(member);
+        refreshToken = jwtTokenProvider.createRefreshToken(member);
 
     }
 
@@ -122,6 +132,23 @@ public class AuthApiTest {
 
         assertThat(redisTemplate.opsForValue().get(loginDto.getUsername())).isNotNull();
 
+    }
+
+    @Test
+    @DisplayName("로그아웃 테스트")
+    void test_logout() throws Exception {
+        //given
+        redisTemplate.opsForValue().set(loginDto.getUsername(),refreshToken);
+
+        mockMvc.perform(post("/logout")
+                        .header("Authorization", "Bearer" + accessToken)
+                        .header("RefreshToken", refreshToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        assertThat(redisTemplate.opsForValue().get(loginDto.getUsername())).isNull();
+        assertThat(redisTemplate.opsForValue().get(accessToken)).isEqualTo("BlackList");
     }
 
 }

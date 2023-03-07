@@ -4,6 +4,7 @@ import org.inssg.backend.member.Member;
 import org.inssg.backend.member.MemberCreate;
 import org.inssg.backend.member.MemberRepository;
 import org.inssg.backend.security.jwt.JwtTokenProvider;
+import org.inssg.backend.security.service.AuthService;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
