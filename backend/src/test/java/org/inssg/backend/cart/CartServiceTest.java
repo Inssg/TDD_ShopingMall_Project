@@ -2,50 +2,59 @@ package org.inssg.backend.cart;
 
 import org.inssg.backend.item.Item;
 import org.inssg.backend.item.ItemRepository;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
+@SpringBootTest
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CartServiceTest {
 
+    @Autowired
     private CartService cartService;
+    @Autowired
     private CartRepository cartRepository;
-    private Map<Long,Item> itemRepository;
-
+    @Autowired
+    private ItemRepository itemRepository;
 
     Item 프로틴;
     Item 닭가슴살;
-    String email;
+    Item 샐러드;
+    Item 스트랩;
 
-    @BeforeEach
+    @BeforeAll
     void setup() {
         프로틴 = Item.create("프로틴", "https://unsplash.com/2", 50000);
         닭가슴살 = Item.create("닭가슴살", "https://unsplash.com/1", 30000);
-        email = "abc@gmail.com";
-        cartRepository = new CartRepository();
-        cartService = new CartService();
-        itemRepository = new HashMap<>();
-        itemRepository.put(1L, 프로틴);
-        itemRepository.put(2L, 닭가슴살);
+        샐러드 = Item.create("샐러드", "https://unsplash.com/1", 3000);
+        스트랩 = Item.create("스트랩", "https://unsplash.com/1", 15000);
+        itemRepository.saveAll(List.of(프로틴, 닭가슴살, 샐러드, 스트랩));
     }
 
     @Test
     void test_addCartItem() {
-        Cart cart = cartService.addCartItem(1L, 1L, 3);
+        Cart cart = cartService.addCartItem(3L, 1L, 3);
 
-        assertThat(itemRepository.get(cart.itemId).getName()).isEqualTo("프로틴");
-        assertThat(cart.quantity).isEqualTo(3);
+        assertThat(itemRepository.findById(cart.getItemId()).get().getName()).isEqualTo("샐러드");
+        assertThat(cart.getQuantity()).isEqualTo(3);
     }
 
     @Test
     void test_getCartItems() {
+        //given
+        cartService.addCartItem(1L, 1L, 2);
+        cartService.addCartItem(2L, 1L, 3);
+
+        //when
         List<Item> cartItems = cartService.getCartItems(1L);
 
         assertThat(cartItems.get(0).getName()).isEqualTo("프로틴");
@@ -55,86 +64,11 @@ public class CartServiceTest {
     @Test
     void test_removeCartItem() {
         //given
-        Cart cart = cartService.addCartItem(1L, 1L, 3);
+        Cart cart = cartService.addCartItem(4L, 1L, 3);
+
         //when
-        cartService.removeCartItem(1L, 2L);
-        assertThat(cartRepository.persistence.get(1L)).isNull();
+        cartService.removeCartItem(1L, 4L);
+        assertThat(cartRepository.findByMemberIdAndItemId(1L,4L)).isNull();
     }
 
-    private class CartService {
-        public Cart addCartItem(Long itemId, Long memberId, int quantity) {
-            Cart cart = cartRepository.findByMemberIdAndItemId(memberId, itemId);
-
-            if (cart == null) {
-                Cart newCart = new Cart(1L, 1L, quantity);
-                cartRepository.save(newCart);
-                return newCart;
-            }
-            cart.setQuantity(quantity);
-            return cart;
-        }
-
-        public List<Item> getCartItems(Long memberId) {
-            List<Cart> carts = cartRepository.findByMemberId(memberId);
-            List<Long> itemIds = carts.stream().map(cart -> cart.itemId).collect(Collectors.toList());
-            List<Item> items = itemIds.stream().map(itemId -> itemRepository.get(itemId)).collect(Collectors.toList());
-            return items;
-        }
-
-        public void removeCartItem(long memberId, long itemId) {
-            Cart cart = cartRepository.findByMemberIdAndItemId(memberId, itemId);
-            cartRepository.delete(cart);
-        }
-    }
-
-    private class CartRepository {
-        Map<Long, Cart> persistence = new HashMap<>();
-
-        private Long sequence = 0L;
-
-        public List<Cart> findByMemberId(Long memberId) {
-            List<Cart> carts = List.of(new Cart(1L, 1L, 2),
-                                    new Cart(2L, 1L, 3));
-            return carts;
-        }
-
-        public Cart findByMemberIdAndItemId(Long memberId, Long itemId) {
-            if(itemId ==1L)return null;
-
-            return persistence.get(1L);
-        }
-
-
-
-        public void save(Cart cart) {
-            cart.setId(++sequence);
-            persistence.put(cart.Id, cart);
-        }
-
-        public void delete(Cart cart) {
-            persistence.remove(cart.Id);
-        }
-    }
-
-    private class Cart {
-        private Long Id;
-        private Long itemId;
-        private Long memberId;
-        private int quantity;
-
-        public Cart(Long itemId, Long memberId, int quantity) {
-            this.itemId = itemId;
-            this.memberId = memberId;
-            this.quantity = quantity;
-        }
-
-        public void setId(Long id) {
-            Id = id;
-        }
-
-        public void setQuantity(int quantity) {
-            this.quantity += quantity;
-        }
-
-    }
 }
