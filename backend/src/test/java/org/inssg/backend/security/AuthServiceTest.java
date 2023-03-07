@@ -64,7 +64,7 @@ public class AuthServiceTest {
     void test_reissue() {
         ValueOperations<String, String> values = redisTemplate.opsForValue();
         values.set(email, refreshToken);
-        Map<String, Object> reissuedToken = authService.reissue(refreshToken);
+        Map<String, String> reissuedToken = authService.reissue(refreshToken);
 
         assertThat(reissuedToken.get("accessToken")).isNotNull();
         assertThat(reissuedToken.get("refreshToken")).isNotNull();

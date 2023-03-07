@@ -22,8 +22,8 @@ public class AuthService {
     private final RedisService redisService;
 
 
-    public Map<String, Object> reissue(String refreshTokenValue) {
-        HashMap<String, Object> reissuedToken = new HashMap<>();
+    public Map<String, String> reissue(String refreshTokenValue) {
+        HashMap<String, String> reissuedToken = new HashMap<>();
         String email = jwtTokenProvider.getEmailFromRefreshToken(refreshTokenValue);
 
         String refreshToken = redisService.getValues(email);
