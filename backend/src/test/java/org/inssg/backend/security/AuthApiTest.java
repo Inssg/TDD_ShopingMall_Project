@@ -23,12 +23,16 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -152,7 +156,7 @@ public class AuthApiTest {
         doNothing().when(authService).logout(Mockito.anyString(), Mockito.anyString());
 
                 mockMvc.perform(post("/member/logout")
-                        .header("Authorization", "Bearer" + accessToken)
+                        .header("Authorization", "Bearer " + accessToken)
                         .header("RefreshToken", refreshToken)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -161,7 +165,22 @@ public class AuthApiTest {
 
     @Test
     @DisplayName("토큰 재발급 테스트")
+    void test_reissue() throws Exception {
+        //given
+        Map<String, String> reissueToken = new HashMap<>();
+        reissueToken.put("accessToken", "sdakjhfewkl213124" );
+        reissueToken.put("refreshToken", "sdfhkj23h42893421sdkhf1");
+        given(authService.reissue(Mockito.anyString()))
+                .willReturn(reissueToken);
 
+        mockMvc.perform(get("/member/reissue")
+                        .header("RefreshToken", refreshToken)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Authorization", "Bearer " + reissueToken.get("accessToken")))
+                .andExpect(header().string("RefreshToken", reissueToken.get("refreshToken")));
+    }
 
 
 }
