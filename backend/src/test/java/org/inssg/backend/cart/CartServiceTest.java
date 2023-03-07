@@ -54,7 +54,11 @@ public class CartServiceTest {
 
     @Test
     void test_removeCartItem() {
-
+        //given
+        Cart cart = cartService.addCartItem(1L, 1L, 3);
+        //when
+        cartService.removeCartItem(1L, 2L);
+        assertThat(cartRepository.persistence.get(1L)).isNull();
     }
 
     private class CartService {
@@ -76,6 +80,11 @@ public class CartServiceTest {
             List<Item> items = itemIds.stream().map(itemId -> itemRepository.get(itemId)).collect(Collectors.toList());
             return items;
         }
+
+        public void removeCartItem(long memberId, long itemId) {
+            Cart cart = cartRepository.findByMemberIdAndItemId(memberId, itemId);
+            cartRepository.delete(cart);
+        }
     }
 
     private class CartRepository {
@@ -90,12 +99,20 @@ public class CartServiceTest {
         }
 
         public Cart findByMemberIdAndItemId(Long memberId, Long itemId) {
-            return null;
+            if(itemId ==1L)return null;
+
+            return persistence.get(1L);
         }
+
+
 
         public void save(Cart cart) {
             cart.setId(++sequence);
             persistence.put(cart.Id, cart);
+        }
+
+        public void delete(Cart cart) {
+            persistence.remove(cart.Id);
         }
     }
 
