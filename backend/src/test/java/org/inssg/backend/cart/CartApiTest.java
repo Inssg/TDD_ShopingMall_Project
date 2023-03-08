@@ -1,5 +1,6 @@
 package org.inssg.backend.cart;
 
+import org.inssg.backend.item.Item;
 import org.inssg.backend.member.Member;
 import org.inssg.backend.member.MemberCreate;
 import org.inssg.backend.member.MemberRepository;
@@ -20,9 +21,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.List;
+
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -80,11 +83,22 @@ public class CartApiTest {
 
     @Test
     @DisplayName("장바구니 조회")
-    void 장바구니_조회() {
+    void 장바구니_조회() throws Exception {
         //given
+        List<Item> items = List.of(Item.create("닭가슴살", "http://unplash.com", 4000),
+                                   Item.create("프로틴", "http://unpash2.com", 50000));
+        given(cartService.getCartItems(Mockito.anyLong()))
+                .willReturn(items);
 
-
-        mockMvc.perform(get("/cart/items/"))
+        mockMvc.perform(get("/cart/items")
+                        .with(user(memberDetails))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].name").value("닭가슴살"))
+                .andExpect(jsonPath("$.[0].price").value(4000))
+                .andExpect(jsonPath("$.[1].name").value("프로틴"))
+                .andExpect(jsonPath("$.[1].price").value(50000));
     }
 
 }
