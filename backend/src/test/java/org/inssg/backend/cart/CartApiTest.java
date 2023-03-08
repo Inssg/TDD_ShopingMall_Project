@@ -87,18 +87,28 @@ public class CartApiTest {
         //given
         List<Item> items = List.of(Item.create("닭가슴살", "http://unplash.com", 4000),
                                    Item.create("프로틴", "http://unpash2.com", 50000));
+        List<Cart> carts = List.of(Cart.builder().itemId(1L).memberId(1L).quantity(3).build(),
+                                    Cart.builder().itemId(2L).memberId(1L).quantity(5).build());
+        List<CartResponse> cartResponses = List.of(CartResponse.of(carts.get(0), items.get(0)),
+                CartResponse.of(carts.get(1), items.get(1)));
+
         given(cartService.getCartItems(Mockito.anyLong()))
-                .willReturn(items);
+                .willReturn(cartResponses);
 
         mockMvc.perform(get("/cart/items")
                         .with(user(memberDetails))
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].name").value("닭가슴살"))
-                .andExpect(jsonPath("$.[0].price").value(4000))
-                .andExpect(jsonPath("$.[1].name").value("프로틴"))
-                .andExpect(jsonPath("$.[1].price").value(50000));
+                .andExpect(jsonPath("$.[0].item.name").value("닭가슴살"))
+                .andExpect(jsonPath("$.[0].item.price").value(4000))
+                .andExpect(jsonPath("$.[0].quantity").value(3))
+                .andExpect(jsonPath("$.[1].item.name").value("프로틴"))
+                .andExpect(jsonPath("$.[1].item.price").value(50000))
+                .andExpect(jsonPath("$.[1].quantity").value(5));
     }
+
+    @Test
+
 
 }

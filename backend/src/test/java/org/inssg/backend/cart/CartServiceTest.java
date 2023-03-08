@@ -55,10 +55,10 @@ public class CartServiceTest {
         cartService.addCartItem(2L, 1L, 3);
 
         //when
-        List<Item> cartItems = cartService.getCartItems(1L);
+        List<CartResponse> cartResponses = cartService.getCartItems(1L);
 
-        assertThat(cartItems.get(0).getName()).isEqualTo("프로틴");
-        assertThat(cartItems.get(1).getName()).isEqualTo("닭가슴살");
+        assertThat(cartResponses.get(0).getItem().getName()).isEqualTo("프로틴");
+        assertThat(cartResponses.get(1).getItem().getName()).isEqualTo("닭가슴살");
     }
 
     @Test

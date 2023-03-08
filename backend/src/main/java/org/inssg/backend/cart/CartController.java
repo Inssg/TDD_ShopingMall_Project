@@ -31,9 +31,9 @@ public class CartController {
     @GetMapping("/items")
     public ResponseEntity getCartItems(@AuthMember MemberDetails memberDetails) {
         Long memberId = memberDetails.getMemberId();
-        List<Item> cartItems = cartService.getCartItems(memberId);
+       List<CartResponse> cartResponses = cartService.getCartItems(memberId);
 
-        return new ResponseEntity(cartItems, HttpStatus.OK);
+        return new ResponseEntity(cartResponses, HttpStatus.OK);
     }
 
 }

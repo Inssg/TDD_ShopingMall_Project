@@ -1,15 +1,10 @@
 package org.inssg.backend.cart;
 
 import lombok.RequiredArgsConstructor;
-import org.inssg.backend.annotation.AuthMember;
-import org.inssg.backend.item.Item;
 import org.inssg.backend.item.ItemNotFound;
 import org.inssg.backend.item.ItemRepository;
-import org.inssg.backend.security.userdetails.MemberDetails;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.Tuple;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,13 +31,12 @@ class CartService {
         return cart;
     }
 
-    public List<Item> getCartItems(Long memberId) {
+    public List<CartResponse> getCartItems(Long memberId) {
         List<Cart> carts = cartRepository.findByMemberId(memberId);
-        List<Long> itemIds = carts.stream().map(cart -> cart.getItemId()).collect(Collectors.toList());
-        List<Item> items = itemIds.stream()
-                .map(itemId -> itemRepository.findById(itemId).orElseThrow(ItemNotFound::new))
+        List<CartResponse> cartResponses = carts.stream().
+                map(cart -> CartResponse.of(cart, itemRepository.findById(cart.getItemId()).orElseThrow(ItemNotFound::new)))
                 .collect(Collectors.toList());
-        return items;
+        return cartResponses;
     }
 
     public void removeCartItem(long memberId, long itemId) {
