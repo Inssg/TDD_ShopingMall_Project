@@ -61,7 +61,7 @@ public class CartApiTest {
 
     @Test
     @DisplayName("장바구니 추가 성공")
-    void 장바구니추가_성공() throws Exception {
+    void 장바구니_추가_성공() throws Exception {
         //given
         Long itemId = 1L;
         given(cartService.addCartItem(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyInt()))
@@ -78,5 +78,13 @@ public class CartApiTest {
 
     }
 
+    @Test
+    @DisplayName("장바구니 조회")
+    void 장바구니_조회() {
+        //given
+
+
+        mockMvc.perform(get("/cart/items/"))
+    }
 
 }
