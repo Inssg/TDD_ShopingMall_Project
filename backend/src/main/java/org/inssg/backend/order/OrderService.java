@@ -2,19 +2,23 @@ package org.inssg.backend.order;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OrderService {
 
     private final OrderRepository orderRepository;
 
-    public void createOrder(OrderCreate orderCreate, Long memberId) {
+    public Order createOrder(OrderCreate orderCreate, Long memberId) {
         Order order = Order.create(memberId, orderCreate);
-        orderRepository.save(order);
+        return orderRepository.save(order);
     }
 
+    @Transactional(readOnly= true)
     public List<Order> getOrders(Long memberId) {
         List<Order> orders = orderRepository.findByMemberIdOrderByIdDesc(memberId);
         return orders;
