@@ -1,4 +1,4 @@
-package item;
+package org.inssg.backend.item;
 
 import org.inssg.backend.item.Item;
 import org.inssg.backend.item.ItemRepository;
