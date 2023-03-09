@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.inssg.backend.member.Member;
-import org.inssg.backend.security.MemberAlreadyLoggedIn;
+import org.inssg.backend.security.exception.MemberAlreadyLoggedIn;
 import org.inssg.backend.security.jwt.JwtTokenProvider;
 import org.inssg.backend.security.dto.LoginDto;
 import org.inssg.backend.security.redis.RedisService;
