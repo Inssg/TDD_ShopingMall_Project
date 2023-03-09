@@ -18,7 +18,7 @@ public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
-
+    //Todo: Cart_Item 다대다로 변경하는것 고려해보기, 지금은 간접 참조중
     private Long itemId;
 
     private Long memberId;

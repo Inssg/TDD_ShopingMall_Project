@@ -18,12 +18,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -107,8 +109,20 @@ public class CartApiTest {
                 .andExpect(jsonPath("$.[1].item.price").value(50000))
                 .andExpect(jsonPath("$.[1].quantity").value(5));
     }
-
     @Test
+    @DisplayName("장바구니 제거")
+    void 장바구니_제거() throws Exception {
+        //given
+        Long itemId = 1L;
+        willDoNothing().given(cartService).removeCartItem(Mockito.anyLong(),Mockito.anyLong());
+
+
+        mockMvc.perform(delete("/cart/items/{itemId}", itemId)
+                        .with(user(memberDetails)))
+                .andExpect(status().isOk());
+
+       verify(cartService,atLeastOnce()).removeCartItem(Mockito.anyLong(),Mockito.anyLong());
+    }
 
 
 }
