@@ -20,14 +20,15 @@ public class OrderServiceTest {
     OrderCreate orderSample;
 
     Long memberId;
+    Long orderId;
 
     @BeforeEach
     void setUp() {
-
         orderCreate = new OrderCreate("힙으뜸", "서울특별시 관악구 서림동", 1L, 6);
         orderSample = new OrderCreate("힙으뜸", "서울특별시 관악구 서림동", 2L, 3);
 
         memberId =1L;
+        orderId = 1L;
         orderService = new OrderService();
         orderRepository = new OrderRepository();
     }
@@ -62,7 +63,14 @@ public class OrderServiceTest {
     }
 
     @Test
-    void test_
+    void test_cancelOrder() {
+        //given
+        orderService.createOrder(orderCreate,memberId);
+        //when
+        orderService.cancelOrder(memberId,orderId);
+        //then
+        assertThat(orderRepository.persistence.get(1L)).isNull();
+    }
 
     private class OrderService {
 
@@ -75,6 +83,11 @@ public class OrderServiceTest {
         public List<Order> getOrders(Long memberId) {
             List<Order> orders = orderRepository.findByMemberId(memberId);
             return orders;
+        }
+
+        public void cancelOrder(Long memberId, Long orderId) {
+           Order order = orderRepository.findByMemberIdAndOrderId(memberId, orderId);
+            orderRepository.delete(order);
         }
     }
 
@@ -121,6 +134,14 @@ public class OrderServiceTest {
         public List<Order> findByMemberId(Long memberId) {
             return List.of(persistence.get(1L),
                             persistence.get(2L));
+        }
+
+        public void delete(Order order) {
+            persistence.remove(order.id);
+        }
+
+        public Order findByMemberIdAndOrderId(Long memberId, Long orderId) {
+            return persistence.get(orderId);
         }
     }
 
