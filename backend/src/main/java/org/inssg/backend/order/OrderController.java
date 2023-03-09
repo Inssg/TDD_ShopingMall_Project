@@ -2,6 +2,7 @@ package org.inssg.backend.order;
 
 import lombok.RequiredArgsConstructor;
 import org.inssg.backend.annotation.AuthMember;
+import org.inssg.backend.member.Member;
 import org.inssg.backend.security.userdetails.MemberDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity createOrder(@RequestBody @Valid OrderCreate orderCreate,
+    public ResponseEntity create(@RequestBody @Valid OrderCreate orderCreate,
                                       @AuthMember MemberDetails memberDetails) {
         Long memberId = memberDetails.getMemberId();
         Order order = orderService.createOrder(orderCreate, memberId);
@@ -33,6 +34,15 @@ public class OrderController {
         List<Order> orders = orderService.getOrders(memberId);
 
         return new ResponseEntity(orders, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{orderId}")
+    public ResponseEntity cancel(@PathVariable("orderId") Long orderId,
+                                 @AuthMember MemberDetails memberDetails) {
+        Long memberId = memberDetails.getMemberId();
+        orderService.cancelOrder(memberId,orderId);
+
+        return new ResponseEntity(HttpStatus.OK);
     }
 
 

@@ -21,6 +21,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -115,9 +118,18 @@ public class OrderApiTest {
     }
 
     @Test
-    void 주문_취소() {
+    void 주문_취소() throws Exception {
+        //given
         Long orderId = 1L;
-        mockMvc.perform(delete("/orders/{orderId}", ))
+        willDoNothing().given(orderService).cancelOrder(Mockito.anyLong(),Mockito.anyLong());
+
+        mockMvc.perform(delete("/orders/{orderId}", orderId)
+                        .with(user(memberDetails))
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(orderService,atLeastOnce()).cancelOrder(Mockito.anyLong(),Mockito.anyLong());
 
     }
 
