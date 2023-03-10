@@ -17,6 +17,11 @@ pipeline {
             checkout scm
             }
         }
+        stage('Build Jar wiht Gradle'){
+            steps {
+            sh './gradlew clean build'
+            }
+        }
         stage('Docker Build'){
             steps{
                 script{
