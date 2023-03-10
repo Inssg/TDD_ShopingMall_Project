@@ -21,7 +21,7 @@ pipeline {
             steps {
                 dir('backend'){
             sh 'ls'
-            sh'chmod +x backend/gradlew'
+            sh'chmod +x gradlew'
             sh './gradlew clean build'
                 }
             }
