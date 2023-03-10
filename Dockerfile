@@ -1,4 +1,4 @@
-FROM openjdk:11-jre-headless
+FROM openjdk:11-jre-slim
 RUN ls
 COPY ./backend .
 RUN ls
