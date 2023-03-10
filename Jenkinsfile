@@ -19,6 +19,7 @@ pipeline {
         }
         stage('Build Jar wiht Gradle'){
             steps {
+            sh 'cd /backend'
             sh './gradlew clean build'
             }
         }
