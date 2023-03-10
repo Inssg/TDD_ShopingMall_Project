@@ -1,6 +1,6 @@
 FROM openjdk:11-jre-slim
 RUN ls
-COPY backend .
+COPY ./backend .
 WORKDIR /backend
 RUN ls
 RUN gradlew clean build
