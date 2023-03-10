@@ -1,7 +1,6 @@
 FROM openjdk:11-jre-slim
 
 COPY . .
-RUN ls
 WORKDIR backend
 RUN ls
 RUN chmod 700 gradlew
