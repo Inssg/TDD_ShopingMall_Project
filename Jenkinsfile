@@ -3,12 +3,12 @@ pipeline {
 
     environment{
         REGION = 'ap-northeast-2'
-        EKS_API = 'https://290A0DE52B1DFEBD19B33069200BB7C5.gr7.ap-northeast-2.eks.amazonaws.com'
-        EKS_CLUSTER_NAME = 'inssg-cluster'
+        EKS_API = 'https://F0FA06DD385AA5980C9CA060719A94D5.gr7.ap-northeast-2.eks.amazonaws.com'
+        EKS_CLUSTER_NAME = 'tddshoppingmall-cluster'
        EKS_JENKINS_CREDENTIAL_ID = 'kubectl-deploy-credentials'
        ECR_PATH = '828222123266.dkr.ecr.ap-northeast-2.amazonaws.com'
        ECR_IMAGE = 'tdd_shoppingmall_project'
-       AWS_CREDENTIAL_ID = 'AWSCredentials'
+       AWS_CREDENTIAL_ID = 'AWS_CREDENTIAL_ID'
 
     }
     stages {
