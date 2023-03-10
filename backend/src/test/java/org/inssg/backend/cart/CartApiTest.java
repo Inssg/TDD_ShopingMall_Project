@@ -12,18 +12,27 @@ import org.junit.jupiter.api.TestInstance;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureWebMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.inssg.backend.util.ApiDocumentUtils.getRequestPreProcessor;
+import static org.inssg.backend.util.ApiDocumentUtils.getResponsePreProcessor;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -31,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CartApiTest {
 
@@ -77,7 +87,22 @@ public class CartApiTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.itemId").value(itemId))
-                .andExpect(jsonPath("$.quantity").value(3));
+                .andExpect(jsonPath("$.quantity").value(3))
+                .andDo(document(
+                        "add-cartItem",
+                        getRequestPreProcessor(),
+                        getResponsePreProcessor(),
+                        pathParameters(parameterWithName("itemId").description("장바구니에 담을 제품 식별자")),
+                        requestParameters(parameterWithName("quantity").description("장바구니에 담을 제품수량")),
+                        responseFields(
+                                List.of(
+                                        fieldWithPath("id").type(JsonFieldType.NUMBER).description("장바구니 식별자"),
+                                        fieldWithPath("itemId").type(JsonFieldType.NUMBER).description("장바구니에 담긴 제품 식별자"),
+                                        fieldWithPath("memberId").type(JsonFieldType.NUMBER).description("회원 식별자"),
+                                        fieldWithPath("quantity").type(JsonFieldType.NUMBER).description("장바구니에 담긴 제품 수량")
+                                )
+                        )
+                ));
 
     }
 
@@ -105,10 +130,42 @@ public class CartApiTest {
                 .andExpect(jsonPath("$.[0].quantity").value(3))
                 .andExpect(jsonPath("$.[1].item.name").value("프로틴"))
                 .andExpect(jsonPath("$.[1].item.price").value(50000))
-                .andExpect(jsonPath("$.[1].quantity").value(5));
+                .andExpect(jsonPath("$.[1].quantity").value(5))
+                //Todo: object 내용 custom 알아보기
+                .andDo(document(
+                        "get-cartList",
+                        getRequestPreProcessor(),
+                        getResponsePreProcessor(),
+                        responseFields(
+                                List.of(
+                                    fieldWithPath("[].cartId").type(JsonFieldType.NUMBER).description("장바구니 식별자"),
+                                    fieldWithPath("[].item").type(JsonFieldType.OBJECT).description("장바구니에 담긴 제품 정보"),
+                                    fieldWithPath("[].quantity").type(JsonFieldType.NUMBER).description("장바구니에 담긴 제품 수량")
+                                )
+                        )
+                ));
     }
-
+    //Todo:Spring Rest docs requstHeader 인증정보
     @Test
+    @DisplayName("장바구니 제거")
+    void 장바구니_제거() throws Exception {
+        //given
+        Long itemId = 1L;
+        willDoNothing().given(cartService).removeCartItem(Mockito.anyLong(),Mockito.anyLong());
+
+
+        mockMvc.perform(delete("/cart/items/{itemId}", itemId)
+                        .with(user(memberDetails)))
+                .andExpect(status().isOk())
+                .andDo(document(
+                        "remove-cart",
+                        getRequestPreProcessor(),
+                        getResponsePreProcessor(),
+                        pathParameters(parameterWithName("itemId").description("장바구니에서 제거할 제품 식별자"))
+                ));
+
+       verify(cartService,atLeastOnce()).removeCartItem(Mockito.anyLong(),Mockito.anyLong());
+    }
 
 
 }

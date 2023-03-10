@@ -82,7 +82,7 @@ public class MemberApiTest {
                                 )
                         ),
                         responseFields(
-                                List.of(fieldWithPath("id").type(JsonFieldType.NUMBER).description("생성된 회원 ID"))
+                                List.of(fieldWithPath("id").type(JsonFieldType.NUMBER).description("생성된 회원 식별자"))
                         )
                 ));
     }

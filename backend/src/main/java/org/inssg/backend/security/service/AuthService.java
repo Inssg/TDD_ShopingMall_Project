@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.inssg.backend.member.Member;
 import org.inssg.backend.member.MemberNotFound;
 import org.inssg.backend.member.MemberRepository;
-import org.inssg.backend.security.TokenNotValid;
+import org.inssg.backend.security.exception.TokenNotValid;
 import org.inssg.backend.security.jwt.JwtTokenProvider;
 import org.inssg.backend.security.redis.RedisService;
 import org.springframework.stereotype.Service;

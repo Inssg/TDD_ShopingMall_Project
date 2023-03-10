@@ -23,7 +23,7 @@ public class Member {
     private String password;
 
     @Column(length = 50, nullable = false)
-    private String username;
+    private String userName;
 
     @Enumerated(EnumType.STRING)
     private Authority authority = Authority.ROLE_USER;
@@ -33,7 +33,7 @@ public class Member {
     public Member(String email, String password, String username) {
         this.email = email;
         this.password = password;
-        this.username = username;
+        this.userName = username;
     }
 
     public static Member create(MemberCreate memberCreate, PasswordEncoder passwordEncoder) {

@@ -36,4 +36,13 @@ public class CartController {
         return new ResponseEntity(cartResponses, HttpStatus.OK);
     }
 
+    @DeleteMapping("/items/{itemId}")
+    public ResponseEntity delete(@PathVariable("itemId") Long itemId,
+                                 @AuthMember MemberDetails memberDetails) {
+        Long memberId = memberDetails.getMemberId();
+        cartService.removeCartItem(memberId,itemId);
+
+        return new ResponseEntity(HttpStatus.OK);
+    }
+
 }

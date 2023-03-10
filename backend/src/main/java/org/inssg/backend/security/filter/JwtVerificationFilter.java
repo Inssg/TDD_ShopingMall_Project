@@ -4,8 +4,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.inssg.backend.security.TokenNotValid;
+import org.inssg.backend.security.exception.TokenNotValid;
 import org.inssg.backend.security.jwt.JwtTokenProvider;
 import org.inssg.backend.security.redis.RedisService;
 import org.inssg.backend.security.userdetails.MemberDetails;
@@ -18,7 +17,6 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.Map;
 

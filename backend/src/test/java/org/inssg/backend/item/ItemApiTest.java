@@ -1,5 +1,8 @@
 package org.inssg.backend.item;
 
+import org.inssg.backend.item.Item;
+import org.inssg.backend.item.ItemRepository;
+import org.inssg.backend.item.ItemService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
