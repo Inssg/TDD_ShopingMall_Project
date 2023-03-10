@@ -1,6 +1,8 @@
 FROM openjdk:11-jre-slim
+
+COPY . .
 RUN ls
-COPY ./backend .
+WORKDIR backend
 RUN ls
 RUN chmod 700 gradlew
 RUN ./gradlew clean build
