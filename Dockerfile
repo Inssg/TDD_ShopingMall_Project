@@ -1,6 +1,7 @@
 FROM openjdk:11-jre-slim
 RUN mkdir -p /app
 WORKDIR /app
+RUN ls
 COPY . ./
 RUN ls
 WORKDIR /backend
