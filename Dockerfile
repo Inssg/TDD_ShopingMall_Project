@@ -4,7 +4,7 @@ WORKDIR /app
 RUN ls
 COPY . ./
 RUN ls
-WORKDIR /backend
+WORKDIR app/backend
 RUN ls
 RUN gradlew clean build
 WORKDIR /build/libs
