@@ -41,4 +41,5 @@ pipeline {
             sh "rm output.yaml"
              }
         }
+    }
 }
