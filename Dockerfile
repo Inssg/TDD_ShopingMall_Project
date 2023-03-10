@@ -2,7 +2,9 @@ FROM openjdk:11-jre-slim
 RUN mkdir -p /app
 WORKDIR /app
 COPY . ./
+RUN ls
 WORKDIR /backend
+RUN ls
 RUN gradlew clean build
 WORKDIR /build/libs
 COPY backend-0.0.1-SNAPSHOT.jar ./
