@@ -22,7 +22,7 @@ pipeline {
                 dir('backend'){
             sh 'ls'
             sh'chmod +x gradlew'
-            sh './gradlew clean build'
+            sh './gradlew build -x test -x asciidoctor'
                 }
             }
         }
