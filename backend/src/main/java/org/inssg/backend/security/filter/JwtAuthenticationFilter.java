@@ -36,11 +36,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         ObjectMapper mapper = new ObjectMapper();
         LoginDto loginDto = mapper.readValue(request.getInputStream(), LoginDto.class);
 
-        if(redisService.getValues(loginDto.getUsername()) != null){
+        if(redisService.getValues(loginDto.getUserName()) != null){
             throw new MemberAlreadyLoggedIn();
         }
 
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginDto.getUserName(), loginDto.getPassword());
         //authenticationManager 에게 인증위임
         return authenticationManager.authenticate(authenticationToken);
     }

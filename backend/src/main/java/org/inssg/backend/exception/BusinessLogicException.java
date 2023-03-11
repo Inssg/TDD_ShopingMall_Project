@@ -1,4 +1,4 @@
-package org.inssg.backend.error;
+package org.inssg.backend.exception;
 
 import lombok.Getter;
 

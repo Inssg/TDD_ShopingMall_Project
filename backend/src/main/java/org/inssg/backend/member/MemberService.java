@@ -1,8 +1,6 @@
 package org.inssg.backend.member;
 
 import lombok.RequiredArgsConstructor;
-import org.inssg.backend.error.BusinessLogicException;
-import org.inssg.backend.error.ExceptionCode;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 

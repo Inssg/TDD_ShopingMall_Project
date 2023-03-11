@@ -85,11 +85,12 @@ public class JwtTokenProviderTest {
     @Test
     @DisplayName("Throw ExpiredJwtException when jws verify")
     void verifyExpirationTest() throws InterruptedException {
-        String accessToken = getAccessToken(Calendar.SECOND, 1);
+
+        String accessToken = getAccessToken(Calendar.SECOND, 2);
 
         assertDoesNotThrow(()->jwtTokenProvider.getClaims(accessToken));
 
-        TimeUnit.MILLISECONDS.sleep(1500);
+        TimeUnit.MILLISECONDS.sleep(2500);
 
         assertThrows(ExpiredJwtException.class, () -> jwtTokenProvider.getClaims(accessToken));
     }

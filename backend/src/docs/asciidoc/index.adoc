@@ -7,12 +7,12 @@
 
 Bang In Seok <rnlrhdwk98@gmail.com>
 
-v1.0.0
-2023.02.16
+v1.0.1
+2023.03.12
 
 ***
 
-== ItemController
+== 제품
 === 상품 리스트 조회
 
 .http-request
@@ -24,9 +24,8 @@ include::{snippets}/get-itemList/http-response.adoc[]
 .response-fields
 include::{snippets}/get-itemList/response-fields.adoc[]
 
-***
 
-== MemberController
+== 회원
 === 회원가입
 
 .http-request
@@ -40,3 +39,126 @@ include::{snippets}/post-signUp/request-fields.adoc[]
 
 .response-fields
 include::{snippets}/post-signUp/response-fields.adoc[]
+
+
+=== 로그인
+
+.http-request
+include::{snippets}/login-returnToken/http-request.adoc[]
+
+.request-fields
+include::{snippets}/login-returnToken/request-fields.adoc[]
+
+.http-response
+include::{snippets}/login-returnToken/http-response.adoc[]
+
+.response-headers
+include::{snippets}/login-returnToken/response-headers.adoc[]
+
+=== 로그아웃
+
+.http-request
+include::{snippets}/logout/http-request.adoc[]
+
+.request-headers
+include::{snippets}/logout/request-headers.adoc[]
+
+.http-response[
+include::{snippets}/logout/http-response.adoc[]
+
+=== 토큰 재발급
+
+.http-request
+include::{snippets}/reissue-Token/http-request.adoc[]
+
+.request-headers
+include::{snippets}/reissue-Token/request-headers.adoc[]
+
+.http-response
+include::{snippets}/reissue-Token/http-response.adoc[]
+
+.response-headers
+include::{snippets}/reissue-Token/response-headers.adoc[]
+
+
+== 장바구니
+=== 장바구니 추가
+
+.http-request
+include::{snippets}/add-cartItem/http-request.adoc[]
+
+.path-parameters
+include::{snippets}/add-cartItem/path-parameters.adoc[]
+
+.request-parameters
+include::{snippets}/add-cartItem/request-parameters.adoc[]
+
+.http-response
+include::{snippets}/add-cartItem/http-response.adoc[]
+
+.response-fields
+include::{snippets}/add-cartItem/response-fields.adoc[]
+
+=== 장바구니 조회
+
+.http-request
+include::{snippets}/get-cartList/http-request.adoc[]
+
+.http-response
+include::{snippets}/get-cartList/http-response.adoc[]
+
+.response-fields
+include::{snippets}/get-cartList/response-fields.adoc[]
+
+=== 장바구니 삭제
+
+.http-request
+include::{snippets}/remove-cart/http-request.adoc[]
+
+.path-parameters
+include::{snippets}/remove-cart/path-parameters.adoc[]
+
+.http-response
+include::{snippets}/remove-cart/http-response.adoc[]
+
+
+== 주문
+=== 주문 요청
+
+.http-request
+include::{snippets}/create-order/http-request.adoc[]
+
+.request-fields
+include::{snippets}/create-order/request-fields.adoc[]
+
+.http-response
+include::{snippets}/create-order/http-response.adoc[]
+
+.response-fields
+include::{snippets}/create-order/response-fields.adoc[]
+
+=== 주문 조회
+
+.http-request
+include::{snippets}/get-orders/http-request.adoc[]
+
+
+.http-response
+include::{snippets}/get-orders/http-response.adoc[]
+
+.response-fields
+include::{snippets}/get-orders/response-fields.adoc[]
+
+=== 주문 취소
+
+.http-request
+include::{snippets}/remove-order/http-request.adoc[]
+
+.path-parameters
+include::{snippets}/remove-order/path-parameters.adoc[]
+
+.http-response
+include::{snippets}/remove-order/http-response.adoc[]
+
+
+

@@ -1,7 +1,7 @@
 package org.inssg.backend.item;
 
-import org.inssg.backend.error.BusinessLogicException;
-import org.inssg.backend.error.ExceptionCode;
+import org.inssg.backend.exception.BusinessLogicException;
+import org.inssg.backend.exception.ExceptionCode;
 
 public class ItemNotFound extends BusinessLogicException {
 

@@ -1,6 +1,5 @@
 package org.inssg.backend.security;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.inssg.backend.member.Member;
 import org.inssg.backend.member.MemberCreate;
@@ -9,36 +8,41 @@ import org.inssg.backend.security.dto.LoginDto;
 import org.inssg.backend.security.jwt.JwtTokenProvider;
 import org.inssg.backend.security.redis.RedisService;
 import org.inssg.backend.security.service.AuthService;
+import org.inssg.backend.util.AcceptanceTest;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockFilterChain;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.inssg.backend.util.ApiDocumentUtils.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.restdocs.headers.HeaderDocumentation.*;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
 @AutoConfigureMockMvc
+@AutoConfigureRestDocs
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class AuthApiTest {
+public class AuthApiTest extends AcceptanceTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -61,6 +65,9 @@ public class AuthApiTest {
     @Autowired
     private ObjectMapper mapper;
 
+    @Autowired
+    private RedisService redisService;
+
     LoginDto loginDto = LoginDto.builder()
             .username("abc@gmail.com")
             .password("1234")
@@ -82,7 +89,11 @@ public class AuthApiTest {
 
         accessToken = jwtTokenProvider.createAccessToken(member);
         refreshToken = jwtTokenProvider.createRefreshToken(member);
+    }
 
+    @AfterEach
+    void setup() {
+        redisService.deleteValues("abc@gmail.com");
     }
 
     @Test
@@ -99,12 +110,32 @@ public class AuthApiTest {
     @Test
     @DisplayName("로그인 성공시, 토큰 반환")
     void test_login_returnsTokenResponse() throws Exception {
+
+        //given
+
+
         mockMvc.perform(post("/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(mapper.writeValueAsString(loginDto)))
                 .andExpect(header().string("Authorization", notNullValue()))
-                .andExpect(header().string("RefreshToken", notNullValue()));
+                .andExpect(header().string("RefreshToken", notNullValue()))
+                .andDo(document(
+                        "login-returnToken",
+                        getRequestPreProcessor(),
+                        getResponsePreProcessor(),
+                        requestFields(
+                                List.of(
+                                        fieldWithPath("userName").type(JsonFieldType.STRING).description("회원 이메일"),
+                                        fieldWithPath("password").type(JsonFieldType.STRING).description("회원 비밀번호")
+                                )
+                        ),
+                        responseHeaders(
+                                List.of(
+                                        headerWithName("Authorization").description("Access Token"),
+                                        headerWithName("RefreshToken").description("Refresh Token"))
+                        )
+                ));
     }
 
     @Test
@@ -145,22 +176,33 @@ public class AuthApiTest {
                         .content(mapper.writeValueAsString(loginDto)))
                 .andExpect(status().isOk());
 
-        assertThat(redisTemplate.opsForValue().get(loginDto.getUsername())).isNotNull();
+        assertThat(redisTemplate.opsForValue().get(loginDto.getUserName())).isNotNull();
 
     }
-    //Todo: 시큐리티 RestDocs 작업
+
     @Test
     @DisplayName("로그아웃 테스트")
     void test_logout() throws Exception {
         //given
         doNothing().when(authService).logout(Mockito.anyString(), Mockito.anyString());
 
-                mockMvc.perform(post("/member/logout")
+        mockMvc.perform(post("/member/logout")
                         .header("Authorization", "Bearer " + accessToken)
                         .header("RefreshToken", refreshToken)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andDo(document(
+                        "logout",
+                        getRequestPreProcessor(),
+                        getResponsePreProcessor(),
+                        requestHeaders(
+                                List.of(
+                                        headerWithName("Authorization").description("Access Token"),
+                                        headerWithName("RefreshToken").description("Refresh Token")
+                                )
+                        )
+                ));
     }
 
     @Test
@@ -179,7 +221,19 @@ public class AuthApiTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Authorization", "Bearer " + reissueToken.get("accessToken")))
-                .andExpect(header().string("RefreshToken", reissueToken.get("refreshToken")));
+                .andExpect(header().string("RefreshToken", reissueToken.get("refreshToken")))
+                .andDo(document(
+                        "reissue-Token",
+                        getRequestPreProcessor(),
+                        getResponsePreProcessor(),
+                        requestHeaders(headerWithName("RefreshToken").description("Refresh Token")),
+                        responseHeaders(
+                                List.of(
+                                        headerWithName("Authorization").description("Access Token"),
+                                        headerWithName("RefreshToken").description("Refresh Token")
+                                )
+                        )
+                ));
     }
 
 
