@@ -38,6 +38,7 @@ public class MemberDetailsServiceTest {
 
     @BeforeAll
     void setUp() {
+        memberRepository.deleteAll();
 
         String email = "abc@gmail.com";
         String password = "1234";
@@ -46,25 +47,24 @@ public class MemberDetailsServiceTest {
         MemberCreate memberCreate = new MemberCreate(email, password, username);
         Member member = Member.create(memberCreate, passwordEncoder);
         memberRepository.save(member);
-
     }
 
     @Test
     @DisplayName("알맞은 email 전달시,MemberDetails 반환 ")
     void test_loadUserByUsername_returnsMemberDetails() {
-        String email = "abc@gmail.com";
-        MemberDetails memberDetails = (MemberDetails) memberDetailsService.loadUserByUsername(email);
+        String correctEmail = "abc@gmail.com";
+        MemberDetails memberDetails = (MemberDetails) memberDetailsService.loadUserByUsername(correctEmail);
 
-        assertThat(memberDetails.getEmail()).isEqualTo(email);
+        assertThat(memberDetails.getEmail()).isEqualTo(correctEmail);
 
     }
 
     @Test
     @DisplayName("틀린 email 전달시, 예외던짐")
     void test_loadUserByUsername_throwsException() {
-        String email = "abc1234@gmail.com";
+        String wrongEmail = "abc1234@gmail.com";
 
         assertThrows(MemberNotFound.class, () ->
-                memberDetailsService.loadUserByUsername(email));
+                memberDetailsService.loadUserByUsername(wrongEmail));
     }
 }

@@ -37,12 +37,13 @@ public class CartServiceTest {
         닭가슴살 = Item.create("닭가슴살", "https://unsplash.com/1", 30000);
         샐러드 = Item.create("샐러드", "https://unsplash.com/1", 3000);
         스트랩 = Item.create("스트랩", "https://unsplash.com/1", 15000);
+
         itemRepository.saveAll(List.of(프로틴, 닭가슴살, 샐러드, 스트랩));
     }
 
     @Test
     void test_addCartItem() {
-        Cart cart = cartService.addCartItem(3L, 1L, 3);
+        Cart cart = cartService.addCartItem(3L, 2L, 3);
 
         assertThat(itemRepository.findById(cart.getItemId()).get().getName()).isEqualTo("샐러드");
         assertThat(cart.getQuantity()).isEqualTo(3);
@@ -50,13 +51,11 @@ public class CartServiceTest {
 
     @Test
     void test_getCartItems() {
-        //given
         cartService.addCartItem(1L, 1L, 2);
         cartService.addCartItem(2L, 1L, 3);
-
         //when
         List<CartResponse> cartResponses = cartService.getCartItems(1L);
-
+        //then
         assertThat(cartResponses.get(0).getItem().getName()).isEqualTo("프로틴");
         assertThat(cartResponses.get(1).getItem().getName()).isEqualTo("닭가슴살");
     }

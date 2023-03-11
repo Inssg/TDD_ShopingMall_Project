@@ -1,10 +1,12 @@
 package org.inssg.backend.cart;
 
 import org.inssg.backend.item.Item;
+import org.inssg.backend.item.ItemRepository;
 import org.inssg.backend.member.Member;
 import org.inssg.backend.member.MemberCreate;
 import org.inssg.backend.member.MemberRepository;
 import org.inssg.backend.security.userdetails.MemberDetails;
+import org.inssg.backend.util.AcceptanceTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -31,18 +33,17 @@ import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class CartApiTest {
+public class CartApiTest extends AcceptanceTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -56,8 +57,16 @@ public class CartApiTest {
     @Autowired
     private MemberRepository memberRepository;
 
+    @Autowired
+    private CartRepository cartRepository;
+
+    @Autowired
+    private ItemRepository itemRepository;
+
 
     MemberDetails memberDetails;
+    Cart cart;
+    List<Item> items;
 
     @BeforeAll
     public void setup() {
@@ -69,6 +78,14 @@ public class CartApiTest {
         Member member = Member.create(memberCreate, passwordEncoder);
         memberRepository.save(member);
         memberDetails = MemberDetails.of(member);
+
+        cart = Cart.builder().itemId(1L).memberId(1L).quantity(3).build();
+
+        items = List.of(Item.create("닭가슴살", "http://unplash.com", 4000),
+                Item.create("프로틴", "http://unpash2.com", 50000));
+
+
+
     }
 
 
@@ -77,8 +94,9 @@ public class CartApiTest {
     void 장바구니_추가_성공() throws Exception {
         //given
         Long itemId = 1L;
+        cartRepository.save(cart);
         given(cartService.addCartItem(Mockito.anyLong(), Mockito.anyLong(), Mockito.anyInt()))
-                .willReturn(Cart.builder().itemId(itemId).memberId(1L).quantity(3).build());
+                .willReturn(cart);
 
         mockMvc.perform(post("/cart/items/{itemId}", itemId)
                         .param("quantity", "3")
@@ -110,12 +128,13 @@ public class CartApiTest {
     @DisplayName("장바구니 조회")
     void 장바구니_조회() throws Exception {
         //given
-        List<Item> items = List.of(Item.create("닭가슴살", "http://unplash.com", 4000),
-                                   Item.create("프로틴", "http://unpash2.com", 50000));
+        itemRepository.saveAll(items);
         List<Cart> carts = List.of(Cart.builder().itemId(1L).memberId(1L).quantity(3).build(),
                                     Cart.builder().itemId(2L).memberId(1L).quantity(5).build());
-        List<CartResponse> cartResponses = List.of(CartResponse.of(carts.get(0), items.get(0)),
-                CartResponse.of(carts.get(1), items.get(1)));
+        List<Cart> cartList = cartRepository.saveAll(carts);
+
+        List<CartResponse> cartResponses = List.of(CartResponse.of(cartList.get(0), items.get(0)),
+                CartResponse.of(cartList.get(1), items.get(1)));
 
         given(cartService.getCartItems(Mockito.anyLong()))
                 .willReturn(cartResponses);
@@ -131,7 +150,6 @@ public class CartApiTest {
                 .andExpect(jsonPath("$.[1].item.name").value("프로틴"))
                 .andExpect(jsonPath("$.[1].item.price").value(50000))
                 .andExpect(jsonPath("$.[1].quantity").value(5))
-                //Todo: object 내용 custom 알아보기
                 .andDo(document(
                         "get-cartList",
                         getRequestPreProcessor(),
@@ -140,6 +158,10 @@ public class CartApiTest {
                                 List.of(
                                     fieldWithPath("[].cartId").type(JsonFieldType.NUMBER).description("장바구니 식별자"),
                                     fieldWithPath("[].item").type(JsonFieldType.OBJECT).description("장바구니에 담긴 제품 정보"),
+                                    fieldWithPath("[].item.id").type(JsonFieldType.NUMBER).description("제품 식별자"),
+                                    fieldWithPath("[].item.name").type(JsonFieldType.STRING).description("제품 이름"),
+                                    fieldWithPath("[].item.imgPath").type(JsonFieldType.STRING).description("제품 이미지"),
+                                    fieldWithPath("[].item.price").type(JsonFieldType.NUMBER).description("제품 가격"),
                                     fieldWithPath("[].quantity").type(JsonFieldType.NUMBER).description("장바구니에 담긴 제품 수량")
                                 )
                         )

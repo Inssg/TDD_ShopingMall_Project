@@ -36,10 +36,8 @@ public class OrderServiceTest {
         orderCreate = new OrderCreate("힙으뜸", "서울특별시 관악구 서림동", 1L, 6);
         orderSample = new OrderCreate("힙으뜸", "서울특별시 관악구 서림동", 2L, 3);
         orderSample2 = new OrderCreate("힙으뜸", "서울특별시 관악구 서림동", 3L, 5);
-
         orderService.createOrder(orderCreate, memberId);
         orderService.createOrder(orderSample,memberId);
-
     }
 
     @Test
@@ -56,8 +54,6 @@ public class OrderServiceTest {
 
     @Test
     void test_getOrder() {
-        //given
-
         //when
         List<Order> orders = orderService.getOrders(memberId);
         //then

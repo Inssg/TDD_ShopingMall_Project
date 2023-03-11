@@ -1,7 +1,7 @@
 package org.inssg.backend.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.inssg.backend.error.ErrorResponse;
+import org.inssg.backend.exception.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 

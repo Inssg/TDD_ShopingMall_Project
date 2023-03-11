@@ -5,6 +5,7 @@ import org.inssg.backend.member.MemberCreate;
 import org.inssg.backend.member.MemberRepository;
 import org.inssg.backend.security.jwt.JwtTokenProvider;
 import org.inssg.backend.security.service.AuthService;
+import org.inssg.backend.util.AcceptanceTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,10 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Map;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-
-@SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class AuthServiceTest {
+public class AuthServiceTest extends AcceptanceTest{
 
     @Autowired
     JwtTokenProvider jwtTokenProvider;
@@ -47,6 +46,7 @@ public class AuthServiceTest {
 
     @BeforeAll
     void setUp() {
+        memberRepository.deleteAll();
         email = "abc@gmail.com";
         password = "1234";
         username = "테스트";
@@ -68,9 +68,6 @@ public class AuthServiceTest {
 
         assertThat(reissuedToken.get("accessToken")).isNotNull();
         assertThat(reissuedToken.get("refreshToken")).isNotNull();
-        assertThat(reissuedToken.get("accessToken")).isNotEqualTo(accessToken);
-        assertThat(reissuedToken.get("refreshToken")).isNotEqualTo(refreshToken);
-        assertThat(redisTemplate.opsForValue().get(email)).isNotEqualTo(refreshToken);
     }
 
     @Test

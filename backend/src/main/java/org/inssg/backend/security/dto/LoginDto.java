@@ -14,14 +14,14 @@ public class LoginDto {
 
     @Email
     @NotBlank(message = "아이디는 공백이 아니어야 합니다.")
-    private String username;
+    private String userName;
 
     @NotBlank(message = "비밀먼호는 공백이 아니어야 합니다.")
     private String password;
 
     @Builder
     public LoginDto(String username, String password) {
-        this.username = username;
+        this.userName = username;
         this.password = password;
     }
 }

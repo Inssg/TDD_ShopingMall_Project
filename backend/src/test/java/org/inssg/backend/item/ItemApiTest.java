@@ -3,6 +3,7 @@ package org.inssg.backend.item;
 import org.inssg.backend.item.Item;
 import org.inssg.backend.item.ItemRepository;
 import org.inssg.backend.item.ItemService;
+import org.inssg.backend.util.AcceptanceTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,10 +28,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
-public class ItemApiTest {
+public class ItemApiTest  extends AcceptanceTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -41,12 +41,13 @@ public class ItemApiTest {
     @Autowired
     private ItemRepository itemRepository;
 
+    Item 프로틴;
+    Item 닭가슴살;
+
     @BeforeEach
      void beforeAll() {
-        Item 프로틴 = Item.create("프로틴", "https://unsplash.com/2", 50000);
-        Item 닭가슴살 = Item.create("닭가슴살", "https://unsplash.com/1", 30000);
-        itemRepository.save(프로틴);
-        itemRepository.save(닭가슴살);
+         프로틴 = Item.create("프로틴", "https://unsplash.com/2", 50000);
+         닭가슴살 = Item.create("닭가슴살", "https://unsplash.com/1", 30000);
 
     }
     //TODO: RestDocs 적용
@@ -54,6 +55,9 @@ public class ItemApiTest {
     @DisplayName("상품리스트 조회")
     @WithMockUser
     void 상품리스트조회() throws Exception {
+        //given
+        itemRepository.save(프로틴);
+        itemRepository.save(닭가슴살);
 
         //when
         ResultActions actions = mockMvc.perform(get("/items")
